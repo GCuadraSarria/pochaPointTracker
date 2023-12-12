@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "376416800961",
+    "project_id": "pocha-points-tracker-861a5",
+    "storage_bucket": "pocha-points-tracker-861a5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376416800961:android:7ba3eb3a2fd1fbbc8c8440",
+        "android_client_info": {
+          "package_name": "com.example.pocha_points_tracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtdj0i46oEIha_nLOQUG6HGImXnG29CNo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
