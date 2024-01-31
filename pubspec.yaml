@@ -40,6 +40,7 @@ dependencies:
   google_fonts: ^6.1.0
   provider:
   flutter_slot_machine: ^0.0.1
+  scroll_snap_list: ^0.9.1
 
 dev_dependencies:
   flutter_test:

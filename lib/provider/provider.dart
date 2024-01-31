@@ -49,7 +49,7 @@ class CurrentPlayers extends ChangeNotifier {
     print('Holiwi $_currentPlayers');
 
     // hay que crear un objeto para preparar la nueva partida:
-
-//Player(name: 'Peke', score: 0, order: 0, bazyvot: false, points: 0),
+    // y no ordena bien
+    // Player(name: 'Peke', score: 0, order: 0, bazyvot: false, points: 0),
   }
 }
