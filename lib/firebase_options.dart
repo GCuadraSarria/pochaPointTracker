@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -65,4 +62,13 @@ class DefaultFirebaseOptions {
     storageBucket: 'pocha-points-tracker-861a5.appspot.com',
     iosBundleId: 'com.example.pochaPointsTracker',
   );
+
+  static const FirebaseOptions web = FirebaseOptions(
+      apiKey: "AIzaSyBUCpw3KzxhsC6s0QKrtxEH3dVuWwtzJuo",
+      authDomain: "pocha-points-tracker-861a5.firebaseapp.com",
+      projectId: "pocha-points-tracker-861a5",
+      storageBucket: "pocha-points-tracker-861a5.appspot.com",
+      messagingSenderId: "376416800961",
+      appId: "1:376416800961:web:41850c14eb07fc598c8440",
+      );
 }

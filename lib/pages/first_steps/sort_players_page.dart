@@ -79,7 +79,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                           key: ValueKey(player),
                           leading: const Icon(Icons.reorder),
                           title: Text(
-                            player,
+                            player.name,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20.0,

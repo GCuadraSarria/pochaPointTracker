@@ -47,11 +47,7 @@ class HomePage extends StatelessWidget {
                   width: 294.0,
                   isFilled: false,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const GameplayPage()),
-                    );
+                    print('Click');
                   },
                 ),
                 const Spacer(),
