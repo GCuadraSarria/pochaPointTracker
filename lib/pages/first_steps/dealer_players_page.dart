@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/game/gameplay_page.dart';
+import 'package:pocha_points_tracker/pages/game/baz_gameplay_page.dart';
+import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
@@ -52,7 +53,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                         ),
                       ),
                       const Text(
-                        '¿Quién reparte?',
+                        '¿Quién va a repartir?',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -92,7 +93,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const GameplayPage()),
+                          builder: (context) => const VoteGameplayPage()),
                     );
                   },
                 ),

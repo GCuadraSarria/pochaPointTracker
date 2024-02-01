@@ -47,7 +47,11 @@ class HomePage extends StatelessWidget {
                   width: 294.0,
                   isFilled: false,
                   onPressed: () {
-                    print('Click');
+                  //  Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //         builder: (context) => const BazGameplayPage()),
+                  //   );
                   },
                 ),
                 const Spacer(),

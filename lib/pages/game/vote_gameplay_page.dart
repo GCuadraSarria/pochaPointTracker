@@ -1,6 +1,5 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/models/player_model.dart';
+import 'package:pocha_points_tracker/pages/game/baz_gameplay_page.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
@@ -9,14 +8,14 @@ import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 
-class GameplayPage extends StatefulWidget {
-  const GameplayPage({super.key});
+class VoteGameplayPage extends StatefulWidget {
+  const VoteGameplayPage({super.key});
 
   @override
-  State<GameplayPage> createState() => _GameplayPageState();
+  State<VoteGameplayPage> createState() => _VoteGameplayPageState();
 }
 
-class _GameplayPageState extends State<GameplayPage> {
+class _VoteGameplayPageState extends State<VoteGameplayPage> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
@@ -48,9 +47,9 @@ class _GameplayPageState extends State<GameplayPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Ronda 2',
-                        style: TextStyle(
+                      Text(
+                        'Ronda ${currentPlayersProvider.round}',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
                           fontWeight: FontWeight.w500,
@@ -71,9 +70,9 @@ class _GameplayPageState extends State<GameplayPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Row(
                     children: [
-                      const Text(
-                        '2 cartas',
-                        style: TextStyle(
+                      Text(
+                        '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
@@ -136,17 +135,22 @@ class _GameplayPageState extends State<GameplayPage> {
                       itemBuilder: (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: PlayerBetContainer(playerIndex: index),
+                          child: PlayerVoteContainer(playerIndex: index),
                         );
                       }),
                 ),
-                // back and next buttons
-                const GoBackButton(),
+                // next button
                 CustomButton(
-                  text: 'Holiwi',
+                  text: 'Bazas',
                   width: 340.0,
                   isDisabled: !currentPlayersProvider.didAllPlayersVote,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const BazGameplayPage()),
+                    );
+                  },
                 ),
               ],
             ),
@@ -157,10 +161,10 @@ class _GameplayPageState extends State<GameplayPage> {
   }
 }
 
-class PlayerBetContainer extends StatelessWidget {
+class PlayerVoteContainer extends StatelessWidget {
   final int playerIndex;
 
-  const PlayerBetContainer({
+  const PlayerVoteContainer({
     super.key,
     required this.playerIndex,
   });
@@ -194,14 +198,6 @@ class PlayerBetContainer extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    const Text(
-                      '+5',
-                      style: TextStyle(
-                        color: CustomColors.correctColor,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
                     const SizedBox(width: 10.0),
                     Text(
                       '${currentPlayersProvider.currentPlayers[playerIndex].score}',
@@ -217,6 +213,7 @@ class PlayerBetContainer extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // right horizontal scroll
                     SizedBox(
                         height: 50.0,
                         width: 100.0,
@@ -234,8 +231,7 @@ class PlayerBetContainer extends StatelessWidget {
   }
 }
 
-List<String> numberList = ['-', '0', '1', '2', '3', '4', '5', '6'];
-
+// horizontal scroll class
 class HorizontalNumberSelector extends StatefulWidget {
   final String currentPlayer;
   const HorizontalNumberSelector({super.key, required this.currentPlayer});
@@ -252,7 +248,7 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
 
     return ScrollSnapList(
       itemBuilder: _buildItemList,
-      itemCount: numberList.length,
+      itemCount: currentPlayersProvider.scrollableNumberList.length,
       background: Colors.amber,
       itemSize: 40.0,
       margin: const EdgeInsets.symmetric(horizontal: 0.5),
@@ -264,10 +260,13 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
             .firstWhere(
               (player) => player.name == widget.currentPlayer,
             )
-            .vote = numberList[index];
-            
+            .vote = currentPlayersProvider.scrollableNumberList[index];
+
         // check if everybody voted
         currentPlayersProvider.checkIfAllPlayersVoted();
+
+        // modify points based on the selection
+        currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
       },
       dynamicItemOpacity: 0.4,
     );
@@ -275,11 +274,12 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
 }
 
 Widget _buildItemList(BuildContext context, int index) {
+  final currentPlayersProvider = context.read<CurrentPlayers>();
   return SizedBox(
     width: 40.0,
     child: Center(
       child: Text(
-        numberList[index],
+        currentPlayersProvider.scrollableNumberList[index],
         style: const TextStyle(
           color: Colors.white,
           fontSize: 40.0,

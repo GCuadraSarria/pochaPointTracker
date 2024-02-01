@@ -14,16 +14,18 @@ class Player {
 
 class PlayerInGame {
   String name;
-  int score = 0;
-  int order = 0;
-  bool bazyvot = false;
+  int score;
+  int order;
+  int localPoints;
   String vote;
-  
+  String baz;
+
   PlayerInGame({
     required this.name,
     this.score = 0,
     this.order = 0,
-    this.bazyvot = false,
+    this.localPoints = 0,
     this.vote = '-',
+    this.baz = '-',
   });
 }

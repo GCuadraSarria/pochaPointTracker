@@ -54,7 +54,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                         ),
                       ),
                       const Text(
-                        '¿En qué orden vais a jugar?',
+                        '¿En qué orden jugaréis?',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
