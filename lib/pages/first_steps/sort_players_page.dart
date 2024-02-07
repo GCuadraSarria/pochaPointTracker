@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/first_steps/dealer_players_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
-import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:provider/provider.dart';
 
@@ -13,19 +12,7 @@ class SortPlayersPage extends StatefulWidget {
 }
 
 class _SortPlayersPageState extends State<SortPlayersPage> {
-  // firestore service
-  final FirestoreService firestoreService = FirestoreService();
 
-  // sort by name / points
-  late bool sortByName = true;
-
-  // new player alertbox
-  Future<String?> newPlayerAlertbox(BuildContext context) {
-    return showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => const NewPlayerAlertbox(),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +80,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                const GoBackButton(),
+                GoBackButton(),
                 CustomButton(
                   text: 'Ir a ver quien reparte',
                   width: 340.0,

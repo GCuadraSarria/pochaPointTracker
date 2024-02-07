@@ -18,8 +18,11 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
-  // sort by name / points
-  late bool sortByName = true;
+  // sort by games / name
+  late bool sortByGames = true;
+
+  // bool to disable button
+  late bool isButtonDisabled = true;
 
   // new player alertbox
   Future<String?> newPlayerAlertbox(BuildContext context) {
@@ -85,7 +88,7 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                     Row(
                       children: [
                         Text(
-                          sortByName ? 'por nombre' : 'por partidas',
+                          sortByGames ? 'por partidas' : 'por nombre',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12.0,
@@ -96,7 +99,7 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                         IconButton(
                           onPressed: () {
                             setState(() {
-                              sortByName = !sortByName;
+                              sortByGames = !sortByGames;
                             });
                           },
                           icon: const Icon(Icons.filter_list),
@@ -109,9 +112,9 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
                     // get players sorted by name or points
-                    stream: sortByName
-                        ? firestoreService.getplayersStreamSortedByName()
-                        : firestoreService.getplayersStreamSortedByGames(),
+                    stream: sortByGames
+                        ? firestoreService.getplayersStreamSortedByGames()
+                        : firestoreService.getplayersStreamSortedByName(),
                     builder: (context, snapshot) {
                       // if we have data, get all docs
                       if (snapshot.hasData) {
@@ -123,16 +126,17 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                             itemBuilder: (context, index) {
                               // get each individual doc
                               DocumentSnapshot document = playersList[index];
-                              String docID = document.id;
 
-                              // get note from each doc
+                              // get player from each doc
                               Map<String, dynamic> data =
                                   document.data() as Map<String, dynamic>;
                               String playerName = data['name'];
+                              bool playerDoPlay = data['doIplay'];
 
                               // display as a list tile
-                              return PlayerSelection(playerName: playerName);
-                              // return ListTile(title: Text(playerName));
+                              return PlayerSelection(
+                                  playerName: playerName,
+                                  playerDoPlay: playerDoPlay);
                             });
                         // if there is no data return nothing
                       } else {
@@ -183,13 +187,14 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                const GoBackButton(),
+                GoBackButton(),
                 CustomButton(
                   text: 'Ir a ordenar jugadores',
                   width: 340.0,
                   // disable button if less than two players are selected
-                  isDisabled: currentPlayersProvider.currentPlayers.length < 2,
+                  isDisabled: currentPlayersProvider.isButtonDisabled,
                   onPressed: () {
+                    currentPlayersProvider.addPlayers();
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 class GoBackButton extends StatelessWidget {
-  const GoBackButton({
+  late String btnText;
+  GoBackButton({
     super.key,
+    this.btnText = 'Atrás',
   });
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () => Navigator.pop(context),
-      child: const Text(
-        'Atrás',
-        style: TextStyle(
+      child: Text(
+        btnText,
+        style: const TextStyle(
           decoration: TextDecoration.underline,
           decorationColor: Colors.white,
           color: Colors.white,

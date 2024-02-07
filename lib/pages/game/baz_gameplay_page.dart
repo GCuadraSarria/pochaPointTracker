@@ -1,6 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/models/player_model.dart';
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
@@ -50,7 +48,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Ronda ${currentPlayersProvider.round}',
+                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.indiaRound == true ? ' (Ciega)' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -142,9 +140,15 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                       }),
                 ),
                 // back and next buttons
-                const GoBackButton(),
+                GoBackButton(),
                 CustomButton(
-                  text: 'Siguente ronda',
+                  text: (currentPlayersProvider.wePlayIndia == true &&
+                              currentPlayersProvider.indiaRound == true) ||
+                          (currentPlayersProvider.wePlayIndia == false &&
+                              currentPlayersProvider.round ==
+                                  (currentPlayersProvider.maxCards * 2))
+                      ? 'Finalizar partida'
+                      : 'Siguente ronda',
                   width: 340.0,
                   isDisabled: !currentPlayersProvider.didAllPlayersBaz,
                   onPressed: () {
@@ -243,7 +247,7 @@ class PlayerBazContainer extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(),                
+                const Spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -302,7 +306,6 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
     return ScrollSnapList(
       itemBuilder: _buildItemList,
       itemCount: currentPlayersProvider.scrollableNumberList.length,
-      background: Colors.amber,
       itemSize: 40.0,
       margin: const EdgeInsets.symmetric(horizontal: 0.5),
       dynamicItemSize: true,

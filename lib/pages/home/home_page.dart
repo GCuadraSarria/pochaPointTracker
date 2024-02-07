@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocha_points_tracker/pages/config/configuration_page.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/widgets/custom_button.dart';
 
@@ -38,7 +39,11 @@ class HomePage extends StatelessWidget {
                   width: 294.0,
                   isFilled: false,
                   onPressed: () {
-                    print('Click');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ConfigurationPage()),
+                    );
                   },
                 ),
                 const SizedBox(height: 20.0),

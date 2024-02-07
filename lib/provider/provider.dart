@@ -1,9 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/models/player_model.dart';
+import 'package:pocha_points_tracker/services/firestore.dart';
 
+// firestore service
+final FirestoreService firestoreService = FirestoreService();
+// get collection of players
+final CollectionReference playersCollection =
+    FirebaseFirestore.instance.collection('players');
+
+// currentplayers provider
 class CurrentPlayers extends ChangeNotifier {
   List<PlayerInGame> _currentPlayers = [];
   List<PlayerInGame> get currentPlayers => _currentPlayers;
+
+  //[playerName, check]
+  List<List<dynamic>> _playerCheckedList = [];
+  List<List<dynamic>> get playerCheckedList => _playerCheckedList;
+
+  bool _isButtonDisabled = true;
+  bool get isButtonDisabled => _isButtonDisabled;
 
   bool _didAllPlayersVote = false;
   bool get didAllPlayersVote => _didAllPlayersVote;
@@ -20,25 +36,38 @@ class CurrentPlayers extends ChangeNotifier {
   List<String> _scrollableNumberList = ['-', '0', '1'];
   List<String> get scrollableNumberList => _scrollableNumberList;
 
+  bool _wePlayIndia = true;
+  bool get wePlayIndia => _wePlayIndia;
+
+  bool _indiaRound = false;
+  bool get indiaRound => _indiaRound;
+
   int _round = 1;
   int get round => _round;
 
-  final int _maxCards = 4;
+  int _maxCards = 7;
   int get maxCards => _maxCards;
 
   int _numberOfCards = 1;
   int get numberOfCards => _numberOfCards;
 
   // add a player to the new game
-  void addCurrentPlayer(String playerName) {
-    _currentPlayers.add(PlayerInGame(name: playerName));
-    notifyListeners();
-  }
-
-  // remove a player from the new game
-  void removeCurrentPlayer(String playerName) {
-    _currentPlayers.removeWhere((player) => player.name == playerName);
-    notifyListeners();
+  Future<void> addPlayers() async {
+    // we filter all players where doIplay is set to true
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance
+              .collection('players')
+              .where('doIplay', isEqualTo: true)
+              .get();
+      // we loop in the document and add everyname filtered to _currentPlayers
+      for (var doc in querySnapshot.docs) {
+        _currentPlayers.add(PlayerInGame(name: doc['name']));
+        notifyListeners();
+      }
+    } catch (error) {
+      print('Error getting players playing: $error');
+    }
   }
 
   // sort players based on the drag and drop
@@ -73,6 +102,43 @@ class CurrentPlayers extends ChangeNotifier {
     for (var i = 0; i < _currentPlayers.length; i++) {
       _currentPlayers[i].order = i;
     }
+    notifyListeners();
+  }
+
+  // enable button
+  void enableButtonToSortPlayers(String playerName, bool? check) {
+    // loop thru the list to check the existences
+    bool playerExists = false;
+    for (var player in playerCheckedList) {
+      // if the player exists, update the check value
+      if (player[0] == playerName) {
+        player[1] = check;
+        playerExists = true;
+        break; // exit loop once player is found
+      }
+    }
+
+    // if the player doesn't exist, add it with the check
+    if (!playerExists) {
+      playerCheckedList.add([playerName, check]);
+    }
+    // we count the amounts of true
+    int count = 0;
+    for (var player in playerCheckedList) {
+      if (player.length > 1 && player[1] == true) {
+        count++;
+      }
+    }
+    print(_playerCheckedList.map((e) => '${e[0]} ${e[1]}'));
+    print('count $count');
+    _isButtonDisabled = count < 2;
+
+    notifyListeners();
+  }
+
+  // set max cards to play with
+  void setMaxCards(int maxCardsSelected) {
+    _maxCards = maxCardsSelected;
     notifyListeners();
   }
 
@@ -127,15 +193,22 @@ class CurrentPlayers extends ChangeNotifier {
   // next round
   void nextRound() {
     _round++;
+    // if we played india round we finish game
+    if (_wePlayIndia == true && _indiaRound == true) {
+      finishGame();
+    }
     // if the round and the max cards match we skip adding or removing
     // in round X and X + 1 we play X cards
-    if ((_maxCards + 1) == round) {
-      // if we are in the last round (max cards * 2 + 1) and we are playing
-      // with india, we play with just 1 card
-      //TODO: add india
-    } else if ((_maxCards * 2 + 1) == round) {
-      _numberOfCards = 1;
+    else if ((_maxCards + 1) == round) {
+      // if we are in the last round (max cards * 2 + 1) and we are NOT playing
+      // india we finish game
+    } else if ((_maxCards * 2 + 1) == round && wePlayIndia == false) {
       finishGame();
+    }
+    // if we are in the last round and we play india we add another round
+    else if ((_maxCards * 2 + 1) == round && wePlayIndia == true) {
+      _indiaRound = true;
+      _numberOfCards = 1;
       // if max cards are smaller than the round that means we are ahead of half of the game
     } else if (_maxCards < round) {
       removeCardsToTheRound();
@@ -219,8 +292,35 @@ class CurrentPlayers extends ChangeNotifier {
     notifyListeners();
   }
 
-  // finish game, check winner, add stats to firebase
+  // finish game, check winner
   void finishGame() {
+    for (int i = 0; i < _currentPlayers.length; i++) {
+      // we add the new points to the current score
+      _currentPlayers[i].score += _currentPlayers[i].localPoints;
+    }
+    // sort the players by score
+    _currentPlayers.sort((a, b) => b.score.compareTo(a.score));
+
+    // set the first player as the winner
+    _currentPlayers.first.winner = true;
+
+    // set the rest of the players with the same score as the winner as winners
+    _currentPlayers
+        .skip(1)
+        .where((player) => player.score == _currentPlayers.first.score)
+        .forEach((player) => player.winner = true);
+
+    // we have to update the score of the players
+    // we have to clean the players localpoints, vote and baz to 0
+    for (int i = 0; i < _currentPlayers.length; i++) {
+      _currentPlayers[i].localPoints = 0;
+      _currentPlayers[i].vote = '-';
+      _currentPlayers[i].baz = '-';
+      // update player by player values
+      firestoreService.updatePlayer(_currentPlayers[i].name,
+          _currentPlayers[i].score, _currentPlayers[i].winner);
+    }
+
     print('Game finished');
     notifyListeners();
   }

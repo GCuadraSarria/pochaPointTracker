@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/game/baz_gameplay_page.dart';
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
@@ -84,7 +83,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                const GoBackButton(),
+                GoBackButton(),
                 CustomButton(
                   text: 'Empezar partida',
                   width: 340.0,

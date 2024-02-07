@@ -112,14 +112,14 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
                 playerExists = true;
               });
             } else {
-              // add player to firebase
-              firestoreService
+              // Add the new player to Firestore
+              await firestoreService
                   .addPlayer(capitalizeFirstLetter(textController.text));
 
-              // clear textfield
+              // Clear textfield
               textController.clear();
 
-              // close alert
+              // Close alert
               Navigator.pop(context);
             }
           },

@@ -48,7 +48,7 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Ronda ${currentPlayersProvider.round}',
+                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.indiaRound == true ? ' (Ciega)' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -249,7 +249,6 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
     return ScrollSnapList(
       itemBuilder: _buildItemList,
       itemCount: currentPlayersProvider.scrollableNumberList.length,
-      background: Colors.amber,
       itemSize: 40.0,
       margin: const EdgeInsets.symmetric(horizontal: 0.5),
       dynamicItemSize: true,
