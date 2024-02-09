@@ -15,7 +15,7 @@ class CurrentPlayers extends ChangeNotifier {
   List<PlayerInGame> get currentPlayers => _currentPlayers;
 
   //[playerName, check]
-  List<List<dynamic>> _playerCheckedList = [];
+  final List<List<dynamic>> _playerCheckedList = [];
   List<List<dynamic>> get playerCheckedList => _playerCheckedList;
 
   bool _isButtonDisabled = true;
@@ -32,6 +32,9 @@ class CurrentPlayers extends ChangeNotifier {
 
   int _totalBaz = 0;
   int get totalBaz => _totalBaz;
+
+  String _sortingRank = 'playerName';
+  String get sortingRank => _sortingRank;
 
   List<String> _scrollableNumberList = ['-', '0', '1'];
   List<String> get scrollableNumberList => _scrollableNumberList;
@@ -62,10 +65,11 @@ class CurrentPlayers extends ChangeNotifier {
               .get();
       // we loop in the document and add everyname filtered to _currentPlayers
       for (var doc in querySnapshot.docs) {
-        _currentPlayers.add(PlayerInGame(name: doc['name']));
+        _currentPlayers.add(PlayerInGame(playerName: doc['playerName']));
         notifyListeners();
       }
     } catch (error) {
+      // ignore: avoid_print
       print('Error getting players playing: $error');
     }
   }
@@ -91,10 +95,15 @@ class CurrentPlayers extends ChangeNotifier {
   }
 
   // sort players based on the dealer
-  void sortByMatch(int indexPlayer) {
-    // Sort the list, moving the specified string to the end
-    // if the dealer is not already the last player in the list
-    if (_currentPlayers.length - 1 != indexPlayer) {
+  void sortByMatch(String dealerName) {
+    // if the dealer is not the last in the list we sort it
+    if (_currentPlayers.last.playerName != dealerName) {
+      int indexPlayer = _currentPlayers
+          .indexWhere((player) => player.playerName == dealerName);
+
+      // Sort the list, moving the specified string to the end
+      // if the dealer is not already the last player in the list
+
       _currentPlayers = _currentPlayers.sublist(indexPlayer + 1)
         ..addAll(_currentPlayers.sublist(0, indexPlayer + 1));
     }
@@ -129,8 +138,6 @@ class CurrentPlayers extends ChangeNotifier {
         count++;
       }
     }
-    print(_playerCheckedList.map((e) => '${e[0]} ${e[1]}'));
-    print('count $count');
     _isButtonDisabled = count < 2;
 
     notifyListeners();
@@ -139,6 +146,18 @@ class CurrentPlayers extends ChangeNotifier {
   // set max cards to play with
   void setMaxCards(int maxCardsSelected) {
     _maxCards = maxCardsSelected;
+    notifyListeners();
+  }
+
+  // set if we play india
+  void setPlayWithIndia(bool? playWithIndiaSelected) {
+    if (playWithIndiaSelected != null) _wePlayIndia = playWithIndiaSelected;
+    notifyListeners();
+  }
+
+  // set sorting value in ranking page
+  void setSortingRank(String sortValue) {
+    _sortingRank = sortValue;
     notifyListeners();
   }
 
@@ -239,14 +258,14 @@ class CurrentPlayers extends ChangeNotifier {
     }
     // we have to sort the players moving everyone upwards, the current
     //index 0 gets the last index because he becomes the dealer
-    sortByMatch(0);
+    sortByMatch(_currentPlayers.first.playerName);
     notifyListeners();
   }
 
   // check player points after a vote or baz
   void checkPlayerPoints(String currentPlayer) {
-    int playerIndex =
-        _currentPlayers.indexWhere((player) => player.name == currentPlayer);
+    int playerIndex = _currentPlayers
+        .indexWhere((player) => player.playerName == currentPlayer);
 
     // if the current player voted and baz we calculate the points
     if (_currentPlayers[playerIndex].vote != '-' &&
@@ -317,11 +336,9 @@ class CurrentPlayers extends ChangeNotifier {
       _currentPlayers[i].vote = '-';
       _currentPlayers[i].baz = '-';
       // update player by player values
-      firestoreService.updatePlayer(_currentPlayers[i].name,
+      firestoreService.updatePlayer(_currentPlayers[i].playerName,
           _currentPlayers[i].score, _currentPlayers[i].winner);
     }
-
-    print('Game finished');
     notifyListeners();
   }
 }

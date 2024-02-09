@@ -66,10 +66,14 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
 
                 // players list animation
                 MySlotMachine(
-                    enableStartButton: enableStartButton,
-                    items: currentPlayersProvider.currentPlayers
-                        .map((player) => player.name)
-                        .toList()),
+                  enableStartButton: enableStartButton,
+                  items: List.generate(
+                          100,
+                          (_) => currentPlayersProvider.currentPlayers
+                              .map((player) => player.playerName))
+                      .expand((element) => element)
+                      .toList(),
+                ),
                 const SizedBox(height: 100),
                 const Text(
                   'Haz tap para parar',
@@ -83,7 +87,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                GoBackButton(),
+                const GoBackButton(),
                 CustomButton(
                   text: 'Empezar partida',
                   width: 340.0,
@@ -109,8 +113,11 @@ class MySlotMachine extends StatefulWidget {
   final List<String> items;
   final Function enableStartButton;
 
-  const MySlotMachine(
-      {super.key, required this.items, required this.enableStartButton});
+  const MySlotMachine({
+    super.key,
+    required this.items,
+    required this.enableStartButton,
+  });
 
   @override
   MySlotMachineState createState() => MySlotMachineState();
@@ -119,7 +126,7 @@ class MySlotMachine extends StatefulWidget {
 class MySlotMachineState extends State<MySlotMachine> {
   late FixedExtentScrollController scrollController;
   late Timer? timer;
-  int selectedItem = 0;
+  int selectedItem = 5;
   // flag to avoid more taps
   bool stopTap = false;
 
@@ -137,13 +144,11 @@ class MySlotMachineState extends State<MySlotMachine> {
   }
 
   void startSpinning() {
-    const duration = Duration(milliseconds: 100);
+    // duration is wheel speed
+    const duration = Duration(milliseconds: 1000);
     timer = Timer.periodic(duration, (Timer timer) {
       setState(() {
         selectedItem++;
-        if (selectedItem == widget.items.length) {
-          selectedItem = 0;
-        }
         scrollController.animateToItem(
           selectedItem,
           duration: duration,
@@ -154,22 +159,36 @@ class MySlotMachineState extends State<MySlotMachine> {
   }
 
   void stopSpinning() {
-    timer?.cancel();
     stopTap = true;
 
-    // Calculate the final selected item based on the current scroll offset
-    final currentOffset = scrollController.position.pixels;
-    const itemExtent = 55.0; // Update with your item extent
-    final itemCount = widget.items.length * 100;
-    final targetItem = (currentOffset / itemExtent).round() % itemCount;
+    // calculate the final selected item based on the current scroll offset
+    // current offset is the pixel where it stopped
+    // itemExtent is the size of the value in the wheel (same itemExent as below)
+    // itemCount the length of the array (we multiplied it *100 before to be large)
+    // targetItem calculates what item we got based on this previous values.
+
+    final currentOffset = scrollController.position.pixels.round();
+    const itemExtent = 55.0;
+    final itemCount = widget.items.length;
+    final targetItem = (currentOffset / itemExtent) % itemCount;
+
+    print(scrollController.position.pixels);
+    print(currentOffset);
+    print(itemCount);
+    print(targetItem);
 
     // Update the selected item and sort by match
     setState(() {
       widget.enableStartButton();
-      selectedItem = targetItem;
-      context.read<CurrentPlayers>().sortByMatch(selectedItem);
     });
-    print('Dealer -> ${widget.items[selectedItem]}');
+    int dealerIndex = targetItem.ceil();
+    context.read<CurrentPlayers>().sortByMatch(widget.items[dealerIndex]);
+    print(dealerIndex);
+
+    //TODO: Properly check if this works
+    print('Dealer -> ${widget.items[targetItem.ceil()]}');
+    //
+    timer?.cancel();
   }
 
   @override
@@ -198,7 +217,7 @@ class MySlotMachineState extends State<MySlotMachine> {
                   );
                 },
                 childCount: widget.items.length *
-                    1000, // Large number for looping effect
+                    100, // Large number for looping effect
               ),
             ),
           ),

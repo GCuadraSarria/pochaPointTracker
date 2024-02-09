@@ -10,7 +10,7 @@ class FirestoreService {
   // Check if a player name already exists
   Future<bool> doesPlayerExist(String playerName) async {
     final QuerySnapshot queryResult =
-        await players.where('name', isEqualTo: playerName).limit(1).get();
+        await players.where('playerName', isEqualTo: playerName).limit(1).get();
 
     return queryResult.docs.isNotEmpty;
   }
@@ -20,30 +20,31 @@ class FirestoreService {
     try {
       // Add the new player document to the "players" collection
       await players.add({
-        'name': playerName,
+        'playerName': playerName,
         'gamesPlayed': 0,
         'winGames': 0,
         'gamesWinRate': 0,
         'doIplay': false,
       });
+      // ignore: avoid_print
       print('Player added to Firestore successfully.');
     } catch (error) {
+      // ignore: avoid_print
       print('Error adding player to Firestore: $error');
     }
   }
 
-  // READ: get players from database sorted by name
-  Stream<QuerySnapshot> getplayersStreamSortedByName() {
-    final Stream<QuerySnapshot> playersStream =
-        players.orderBy('name', descending: false).snapshots();
-    return playersStream;
-  }
-
-  // READ: get players from database sorted by games
-  Stream<QuerySnapshot> getplayersStreamSortedByGames() {
-    final Stream<QuerySnapshot> playersStream =
-        players.orderBy('gamesPlayed', descending: true).snapshots();
-    return playersStream;
+  // READ: get players to show the info
+  Stream<QuerySnapshot> showPlayersInfoSorted(String sortValue) {
+    if (sortValue == 'playerName') {
+      final Stream<QuerySnapshot> playersStream =
+          players.orderBy(sortValue, descending: false).snapshots();
+      return playersStream;
+    } else {
+      final Stream<QuerySnapshot> playersStream =
+          players.orderBy(sortValue, descending: true).snapshots();
+      return playersStream;
+    }
   }
 
   // UPDATE: update players based on name
@@ -53,7 +54,7 @@ class FirestoreService {
       if (playerName.isNotEmpty) {
         // Query Firestore to find the document where the name matches the provided playerName
         QuerySnapshot querySnapshot =
-            await players.where('name', isEqualTo: playerName).get();
+            await players.where('playerName', isEqualTo: playerName).get();
 
         // Iterate over the documents in the query snapshot
         for (var doc in querySnapshot.docs) {
@@ -80,9 +81,11 @@ class FirestoreService {
           });
         }
       } else {
+        // ignore: avoid_print
         print('Invalid player name.');
       }
     } catch (error) {
+      // ignore: avoid_print
       print('Error updating player stats: $error');
     }
   }
@@ -94,7 +97,7 @@ class FirestoreService {
       if (playerName.isNotEmpty) {
         // Query Firestore to find the document where the name matches the provided playerName
         QuerySnapshot querySnapshot =
-            await players.where('name', isEqualTo: playerName).get();
+            await players.where('playerName', isEqualTo: playerName).get();
 
         // Iterate over the documents in the query snapshot
         for (var doc in querySnapshot.docs) {
@@ -110,9 +113,11 @@ class FirestoreService {
           });
         }
       } else {
+        // ignore: avoid_print
         print('Invalid player name.');
       }
     } catch (error) {
+      // ignore: avoid_print
       print('Error updating doIplay: $error');
     }
   }

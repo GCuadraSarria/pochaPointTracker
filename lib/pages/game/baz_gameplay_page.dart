@@ -95,7 +95,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                         ),
                       ),
                       Text(
-                        currentPlayersProvider.currentPlayers.last.name,
+                        currentPlayersProvider.currentPlayers.last.playerName,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
@@ -140,7 +140,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                       }),
                 ),
                 // back and next buttons
-                GoBackButton(),
+                const GoBackButton(),
                 CustomButton(
                   text: (currentPlayersProvider.wePlayIndia == true &&
                               currentPlayersProvider.indiaRound == true) ||
@@ -225,7 +225,7 @@ class PlayerBazContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      currentPlayersProvider.currentPlayers[playerIndex].name,
+                      currentPlayersProvider.currentPlayers[playerIndex].playerName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22.0,
@@ -274,9 +274,9 @@ class PlayerBazContainer extends StatelessWidget {
                     SizedBox(
                         height: 50.0,
                         width: 100.0,
-                        child: HorizontalNumberSelector(
+                        child: HorizontalNumberSelectorBaz(
                             currentPlayer: currentPlayersProvider
-                                .currentPlayers[playerIndex].name)),
+                                .currentPlayers[playerIndex].playerName)),
                   ],
                 ),
               ],
@@ -289,16 +289,16 @@ class PlayerBazContainer extends StatelessWidget {
 }
 
 // horizontal scroll class
-class HorizontalNumberSelector extends StatefulWidget {
+class HorizontalNumberSelectorBaz extends StatefulWidget {
   final String currentPlayer;
-  const HorizontalNumberSelector({super.key, required this.currentPlayer});
+  const HorizontalNumberSelectorBaz({super.key, required this.currentPlayer});
 
   @override
-  State<HorizontalNumberSelector> createState() =>
-      _HorizontalNumberSelectorState();
+  State<HorizontalNumberSelectorBaz> createState() =>
+      _HorizontalNumberSelectorBazState();
 }
 
-class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
+class _HorizontalNumberSelectorBazState extends State<HorizontalNumberSelectorBaz> {
   @override
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();
@@ -314,7 +314,7 @@ class _HorizontalNumberSelectorState extends State<HorizontalNumberSelector> {
         // to the selected numberList
         currentPlayersProvider.currentPlayers
             .firstWhere(
-              (player) => player.name == widget.currentPlayer,
+              (player) => player.playerName == widget.currentPlayer,
             )
             .baz = currentPlayersProvider.scrollableNumberList[index];
 

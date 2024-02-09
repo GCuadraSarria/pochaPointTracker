@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class GoBackButton extends StatelessWidget {
-  late String btnText;
-  GoBackButton({
+  final String btnText;
+  const GoBackButton({
     super.key,
     this.btnText = 'Atrás',
   });

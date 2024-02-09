@@ -120,7 +120,7 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
               textController.clear();
 
               // Close alert
-              Navigator.pop(context);
+               Navigator.pop(context);
             }
           },
           text: 'Agregar jugador',

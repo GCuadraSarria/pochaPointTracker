@@ -109,12 +109,13 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                   ],
                 ),
                 // players list
-                Expanded(
+                Flexible(
+                  flex: 3,
                   child: StreamBuilder<QuerySnapshot>(
                     // get players sorted by name or points
                     stream: sortByGames
-                        ? firestoreService.getplayersStreamSortedByGames()
-                        : firestoreService.getplayersStreamSortedByName(),
+                        ? firestoreService.showPlayersInfoSorted('gamesPlayed')
+                        : firestoreService.showPlayersInfoSorted('playerName'),
                     builder: (context, snapshot) {
                       // if we have data, get all docs
                       if (snapshot.hasData) {
@@ -130,7 +131,7 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                               // get player from each doc
                               Map<String, dynamic> data =
                                   document.data() as Map<String, dynamic>;
-                              String playerName = data['name'];
+                              String playerName = data['playerName'];
                               bool playerDoPlay = data['doIplay'];
 
                               // display as a list tile
@@ -140,7 +141,7 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                             });
                         // if there is no data return nothing
                       } else {
-                        return const Text('');
+                        return const LoadingProgress();
                       }
                     },
                   ),
@@ -187,13 +188,15 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                GoBackButton(),
+                const GoBackButton(),
                 CustomButton(
                   text: 'Ir a ordenar jugadores',
                   width: 340.0,
                   // disable button if less than two players are selected
                   isDisabled: currentPlayersProvider.isButtonDisabled,
                   onPressed: () {
+                    // we clear the player list before adding the players
+                    currentPlayersProvider.currentPlayers.clear();
                     currentPlayersProvider.addPlayers();
                     Navigator.push(
                       context,

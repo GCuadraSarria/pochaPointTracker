@@ -66,7 +66,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                           key: ValueKey(player),
                           leading: const Icon(Icons.reorder),
                           title: Text(
-                            player.name,
+                            player.playerName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20.0,
@@ -80,7 +80,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                GoBackButton(),
+                const GoBackButton(),
                 CustomButton(
                   text: 'Ir a ver quien reparte',
                   width: 340.0,

@@ -1,5 +1,5 @@
 class PlayerInGame {
-  String name;
+  String playerName;
   int score;
   int currentWinGames;
   int order;
@@ -9,7 +9,7 @@ class PlayerInGame {
   bool winner;
 
   PlayerInGame({
-    required this.name,
+    required this.playerName,
     this.score = 0,
     this.currentWinGames = 0,
     this.order = 0,
