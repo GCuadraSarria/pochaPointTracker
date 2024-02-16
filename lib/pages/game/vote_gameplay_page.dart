@@ -48,7 +48,7 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.indiaRound == true ? ' (Ciega)' : ''}',
+                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -190,7 +190,8 @@ class PlayerVoteContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      currentPlayersProvider.currentPlayers[playerIndex].playerName,
+                      currentPlayersProvider
+                          .currentPlayers[playerIndex].playerName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22.0,
@@ -241,7 +242,8 @@ class HorizontalNumberSelectorVote extends StatefulWidget {
       _HorizontalNumberSelectorVoteState();
 }
 
-class _HorizontalNumberSelectorVoteState extends State<HorizontalNumberSelectorVote> {
+class _HorizontalNumberSelectorVoteState
+    extends State<HorizontalNumberSelectorVote> {
   @override
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();

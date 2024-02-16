@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pocha_points_tracker/firebase_options.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:provider/provider.dart';
+
 import 'pages/pages.dart';
 
 void main() async {
@@ -26,11 +26,15 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        textTheme: GoogleFonts.robotoTextTheme(
-          Theme.of(context).textTheme,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Roboto'),
+          bodyMedium: TextStyle(fontFamily: 'Roboto'),
+          displayLarge: TextStyle(fontFamily: 'Roboto'),
         ),
       ),
+
       home: const HomePage(),
+      // home: const WinnerGameplayPage(),
     );
   }
 }

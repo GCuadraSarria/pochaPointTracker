@@ -1,10 +1,14 @@
-import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:random_text_reveal/random_text_reveal.dart';
+
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
+import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
-import 'package:provider/provider.dart';
 
 class DealerPlayersPage extends StatefulWidget {
   const DealerPlayersPage({super.key});
@@ -17,13 +21,15 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
-  // finished tap flag
+// finished tap flag
   bool ableButton = false;
 
-  // method to set the flag
-  bool enableStartButton() {
-    ableButton = true;
-    return ableButton;
+// method to set the flag
+  void enableStartButton() {
+    setState(() {
+      ableButton = true;
+    });
+    debugPrint('able button: $ableButton');
   }
 
   @override
@@ -54,7 +60,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                       const Text(
                         '¿Quién va a repartir?',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: CustomColors.whiteColor,
                           fontSize: 24.0,
                           fontWeight: FontWeight.w500,
                         ),
@@ -63,27 +69,12 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                   ),
                 ),
                 const Spacer(),
-
                 // players list animation
-                MySlotMachine(
-                  enableStartButton: enableStartButton,
-                  items: List.generate(
-                          100,
-                          (_) => currentPlayersProvider.currentPlayers
-                              .map((player) => player.playerName))
-                      .expand((element) => element)
-                      .toList(),
-                ),
-                const SizedBox(height: 100),
-                const Text(
-                  'Haz tap para parar',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-
+                RandomTextDecode(enableStartButton: (){
+                  setState(() {
+                    enableStartButton();
+                  });
+                }),
                 const Spacer(),
 
                 // back and next buttons
@@ -91,7 +82,8 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                 CustomButton(
                   text: 'Empezar partida',
                   width: 340.0,
-                  isDisabled: !ableButton,
+                  isDisabled: false,
+                  // isDisabled: !ableButton,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -109,133 +101,45 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
   }
 }
 
-class MySlotMachine extends StatefulWidget {
-  final List<String> items;
-  final Function enableStartButton;
-
-  const MySlotMachine({
+class RandomTextDecode extends StatelessWidget {
+  final void Function()? enableStartButton;
+  const RandomTextDecode({
     super.key,
-    required this.items,
-    required this.enableStartButton,
+    this.enableStartButton,
   });
 
   @override
-  MySlotMachineState createState() => MySlotMachineState();
-}
-
-class MySlotMachineState extends State<MySlotMachine> {
-  late FixedExtentScrollController scrollController;
-  late Timer? timer;
-  int selectedItem = 5;
-  // flag to avoid more taps
-  bool stopTap = false;
-
-  @override
-  void initState() {
-    super.initState();
-    scrollController = FixedExtentScrollController(initialItem: selectedItem);
-    startSpinning();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel(); // Cancel the timer if it's not null
-    super.dispose();
-  }
-
-  void startSpinning() {
-    // duration is wheel speed
-    const duration = Duration(milliseconds: 1000);
-    timer = Timer.periodic(duration, (Timer timer) {
-      setState(() {
-        selectedItem++;
-        scrollController.animateToItem(
-          selectedItem,
-          duration: duration,
-          curve: Curves.linear,
-        );
-      });
-    });
-  }
-
-  void stopSpinning() {
-    stopTap = true;
-
-    // calculate the final selected item based on the current scroll offset
-    // current offset is the pixel where it stopped
-    // itemExtent is the size of the value in the wheel (same itemExent as below)
-    // itemCount the length of the array (we multiplied it *100 before to be large)
-    // targetItem calculates what item we got based on this previous values.
-
-    final currentOffset = scrollController.position.pixels.round();
-    const itemExtent = 55.0;
-    final itemCount = widget.items.length;
-    final targetItem = (currentOffset / itemExtent) % itemCount;
-
-    print(scrollController.position.pixels);
-    print(currentOffset);
-    print(itemCount);
-    print(targetItem);
-
-    // Update the selected item and sort by match
-    setState(() {
-      widget.enableStartButton();
-    });
-    int dealerIndex = targetItem.ceil();
-    context.read<CurrentPlayers>().sortByMatch(widget.items[dealerIndex]);
-    print(dealerIndex);
-
-    //TODO: Properly check if this works
-    print('Dealer -> ${widget.items[targetItem.ceil()]}');
-    //
-    timer?.cancel();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: !stopTap ? stopSpinning : null,
-      child: Stack(
-        alignment: AlignmentDirectional.center,
-        children: [
-          SizedBox(
-            height: 150,
-            child: ListWheelScrollView.useDelegate(
-              controller: scrollController,
-              physics: const FixedExtentScrollPhysics(),
-              itemExtent: 55,
-              childDelegate: ListWheelChildBuilderDelegate(
-                builder: (context, index) {
-                  final itemIndex = index % widget.items.length;
-                  return Text(
-                    widget.items[itemIndex],
-                    style: const TextStyle(
-                      fontSize: 38.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  );
-                },
-                childCount: widget.items.length *
-                    100, // Large number for looping effect
-              ),
-            ),
-          ),
-          Container(
-            height: 150,
-            width: 250,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(29, 29, 29, 1.0), // 100% opacity
-                    Color.fromRGBO(29, 29, 29, 0.0), // 0% opacity
-                    Color.fromRGBO(29, 29, 29, 1.0), // 100% opacity
-                  ]),
-            ),
-          )
-        ],
+    // provider
+    final currentPlayersProvider = context.read<CurrentPlayers>();
+
+    // method that randomize a player to be the dealer
+    String randomPlayer() {
+      // generate random number to get index
+      final random = Random();
+      int randomIndex =
+          random.nextInt(currentPlayersProvider.currentPlayers.length - 1);
+      // return name based on the index
+      return currentPlayersProvider.currentPlayers[randomIndex].playerName;
+    }
+
+    return Expanded(
+      child: RandomTextReveal(
+        initialText: 'Ae8&vNQ32cK^',
+        shouldPlayOnStart: true,
+        text: randomPlayer(),
+        duration: const Duration(seconds: 3),
+        style: const TextStyle(
+          fontSize: 38.0,
+          color: CustomColors.whiteColor,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 2.0,
+        ),
+        randomString: Source.alphabets,
+        onFinished: () => enableStartButton,
+        curve: Curves.easeIn,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
       ),
     );
   }

@@ -15,7 +15,7 @@ class CurrentPlayers extends ChangeNotifier {
   List<PlayerInGame> get currentPlayers => _currentPlayers;
 
   //[playerName, check]
-  final List<List<dynamic>> _playerCheckedList = [];
+  List<List<dynamic>> _playerCheckedList = [];
   List<List<dynamic>> get playerCheckedList => _playerCheckedList;
 
   bool _isButtonDisabled = true;
@@ -42,8 +42,8 @@ class CurrentPlayers extends ChangeNotifier {
   bool _wePlayIndia = true;
   bool get wePlayIndia => _wePlayIndia;
 
-  bool _indiaRound = false;
-  bool get indiaRound => _indiaRound;
+  bool _lastRound = false;
+  bool get lastRound => _lastRound;
 
   int _round = 1;
   int get round => _round;
@@ -91,6 +91,13 @@ class CurrentPlayers extends ChangeNotifier {
     // Update the _currentPlayers list
     _currentPlayers = updatedPlayers;
 
+    notifyListeners();
+  }
+
+  // sort players by score
+  void sortByScore() {
+    _currentPlayers = _currentPlayers.toList()
+      ..sort((a, b) => b.score.compareTo(a.score));
     notifyListeners();
   }
 
@@ -212,25 +219,23 @@ class CurrentPlayers extends ChangeNotifier {
   // next round
   void nextRound() {
     _round++;
-    // if we played india round we finish game
-    if (_wePlayIndia == true && _indiaRound == true) {
-      finishGame();
-    }
+
     // if the round and the max cards match we skip adding or removing
     // in round X and X + 1 we play X cards
-    else if ((_maxCards + 1) == round) {
-      // if we are in the last round (max cards * 2 + 1) and we are NOT playing
-      // india we finish game
-    } else if ((_maxCards * 2 + 1) == round && wePlayIndia == false) {
-      finishGame();
-    }
-    // if we are in the last round and we play india we add another round
-    else if ((_maxCards * 2 + 1) == round && wePlayIndia == true) {
-      _indiaRound = true;
+    if ((_maxCards + 1) == _round) {
+      // if we are in the last round and we play india we add another round and set lastRound = true
+    } else if (_wePlayIndia == true && (_maxCards * 2 + 1) == _round) {
+      _lastRound = true;
       _numberOfCards = 1;
+
+      // if we are in the last round and we play india we add another round and set lastRound = true
+    } else if (_wePlayIndia == false && _maxCards * 2 == _round) {
+      _lastRound = true;
+
       // if max cards are smaller than the round that means we are ahead of half of the game
-    } else if (_maxCards < round) {
+    } else if (_maxCards < _round) {
       removeCardsToTheRound();
+
       // in the rest of cases we just add cards
     } else {
       addCardsToTheRound();
@@ -256,6 +261,7 @@ class CurrentPlayers extends ChangeNotifier {
       _currentPlayers[i].vote = '-';
       _currentPlayers[i].baz = '-';
     }
+
     // we have to sort the players moving everyone upwards, the current
     //index 0 gets the last index because he becomes the dealer
     sortByMatch(_currentPlayers.first.playerName);
@@ -318,7 +324,7 @@ class CurrentPlayers extends ChangeNotifier {
       _currentPlayers[i].score += _currentPlayers[i].localPoints;
     }
     // sort the players by score
-    _currentPlayers.sort((a, b) => b.score.compareTo(a.score));
+    sortByScore();
 
     // set the first player as the winner
     _currentPlayers.first.winner = true;
@@ -338,7 +344,25 @@ class CurrentPlayers extends ChangeNotifier {
       // update player by player values
       firestoreService.updatePlayer(_currentPlayers[i].playerName,
           _currentPlayers[i].score, _currentPlayers[i].winner);
+      firestoreService.restartPlayers();
     }
+    notifyListeners();
+  }
+
+  void restartGame() {
+    _currentPlayers = [];
+    _scrollableNumberList = ['-', '0', '1'];
+    _playerCheckedList = [];
+    _isButtonDisabled = true;
+    _didAllPlayersVote = false;
+    _didAllPlayersBaz = false;
+    _totalVotes = 0;
+    _totalBaz = 0;
+    _sortingRank = 'playerName';
+    _lastRound = false;
+    _round = 1;
+    _numberOfCards = 1;
+    _lastRound = false;
     notifyListeners();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
+import 'package:pocha_points_tracker/pages/game/winner_gameplay_page.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
@@ -32,6 +33,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    // provider service
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
     return Consumer<CurrentPlayers>(
@@ -48,7 +50,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.indiaRound == true ? ' (Ciega)' : ''}',
+                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -142,23 +144,32 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                 // back and next buttons
                 const GoBackButton(),
                 CustomButton(
-                  text: (currentPlayersProvider.wePlayIndia == true &&
-                              currentPlayersProvider.indiaRound == true) ||
-                          (currentPlayersProvider.wePlayIndia == false &&
-                              currentPlayersProvider.round ==
-                                  (currentPlayersProvider.maxCards * 2))
+                  text: currentPlayersProvider.lastRound
                       ? 'Finalizar partida'
                       : 'Siguente ronda',
                   width: 340.0,
                   isDisabled: !currentPlayersProvider.didAllPlayersBaz,
-                  onPressed: () {
-                    currentPlayersProvider.nextRound();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const VoteGameplayPage()),
-                    );
-                  },
+                  onPressed: !currentPlayersProvider.lastRound
+                      ? () {
+                          //not last round,
+                          currentPlayersProvider.nextRound();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const VoteGameplayPage(),
+                            ),
+                          );
+                        }
+                      : () {
+                          //last round,
+                          currentPlayersProvider.finishGame();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WinnerGameplayPage(),
+                            ),
+                          );
+                        },
                 ),
               ],
             ),
@@ -225,7 +236,8 @@ class PlayerBazContainer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      currentPlayersProvider.currentPlayers[playerIndex].playerName,
+                      currentPlayersProvider
+                          .currentPlayers[playerIndex].playerName,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22.0,
@@ -298,7 +310,8 @@ class HorizontalNumberSelectorBaz extends StatefulWidget {
       _HorizontalNumberSelectorBazState();
 }
 
-class _HorizontalNumberSelectorBazState extends State<HorizontalNumberSelectorBaz> {
+class _HorizontalNumberSelectorBazState
+    extends State<HorizontalNumberSelectorBaz> {
   @override
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();

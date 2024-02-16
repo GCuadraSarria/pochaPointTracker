@@ -122,6 +122,28 @@ class FirestoreService {
     }
   }
 
+  // UPDATE: update players restart game
+  Future<void> restartPlayers() async {
+    try {
+      // Check if the playerName is not empty or null
+
+      // Query Firestore to find the document where the name matches the provided playerName
+      QuerySnapshot querySnapshot =
+          await players.get();
+
+      // Iterate over the documents in the query snapshot
+      for (var doc in querySnapshot.docs) {
+        // Update the player's do I play when we check
+        await doc.reference.update({
+          'doIplay': false,
+        });
+      }
+    } catch (error) {
+      // ignore: avoid_print
+      print('Error updating doIplay: $error');
+    }
+  }
+
   // DELETE: delete player given a doc id
   Future<void> deletePlayer(String docID) {
     return players.doc(docID).delete();

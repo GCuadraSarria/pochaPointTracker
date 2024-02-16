@@ -188,7 +188,24 @@ class _SelectPlayersPageState extends State<SelectPlayersPage> {
                 const Spacer(),
 
                 // back and next buttons
-                const GoBackButton(),
+                TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomePage(),
+                    ),
+                  ),
+                  child: const Text(
+                    'Atrás',
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      decorationColor: Colors.white,
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
                 CustomButton(
                   text: 'Ir a ordenar jugadores',
                   width: 340.0,
