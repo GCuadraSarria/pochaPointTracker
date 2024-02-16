@@ -70,11 +70,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                 ),
                 const Spacer(),
                 // players list animation
-                RandomTextDecode(enableStartButton: (){
-                  setState(() {
-                    enableStartButton();
-                  });
-                }),
+                const RandomTextDecode(),
                 const Spacer(),
 
                 // back and next buttons
@@ -82,8 +78,7 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
                 CustomButton(
                   text: 'Empezar partida',
                   width: 340.0,
-                  isDisabled: false,
-                  // isDisabled: !ableButton,
+                  isDisabled: !currentPlayersProvider.dealerFlag,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -102,10 +97,8 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
 }
 
 class RandomTextDecode extends StatelessWidget {
-  final void Function()? enableStartButton;
   const RandomTextDecode({
     super.key,
-    this.enableStartButton,
   });
 
   @override
@@ -113,21 +106,28 @@ class RandomTextDecode extends StatelessWidget {
     // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
+    // dealer
+    late String dealer;
+
     // method that randomize a player to be the dealer
-    String randomPlayer() {
+    void randomPlayer() {
+      print('we did it bro');
       // generate random number to get index
       final random = Random();
       int randomIndex =
           random.nextInt(currentPlayersProvider.currentPlayers.length - 1);
       // return name based on the index
-      return currentPlayersProvider.currentPlayers[randomIndex].playerName;
+      dealer = currentPlayersProvider.currentPlayers[randomIndex].playerName;
     }
+
+    // we call the method
+    randomPlayer();
 
     return Expanded(
       child: RandomTextReveal(
         initialText: 'Ae8&vNQ32cK^',
         shouldPlayOnStart: true,
-        text: randomPlayer(),
+        text: dealer,
         duration: const Duration(seconds: 3),
         style: const TextStyle(
           fontSize: 38.0,
@@ -136,7 +136,13 @@ class RandomTextDecode extends StatelessWidget {
           letterSpacing: 2.0,
         ),
         randomString: Source.alphabets,
-        onFinished: () => enableStartButton,
+        onFinished: () {
+          // Delay the execution of gotDealer() to ensure it's not called during build
+          Future.delayed(Duration.zero, () {
+            currentPlayersProvider.gotDealer();
+            currentPlayersProvider.sortByMatch(dealer);
+          });
+        },
         curve: Curves.easeIn,
         overflow: TextOverflow.ellipsis,
         maxLines: 1,

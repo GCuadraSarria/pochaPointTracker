@@ -54,6 +54,9 @@ class CurrentPlayers extends ChangeNotifier {
   int _numberOfCards = 1;
   int get numberOfCards => _numberOfCards;
 
+  bool _dealerFlag = false;
+  bool get dealerFlag => _dealerFlag;
+
   // add a player to the new game
   Future<void> addPlayers() async {
     // we filter all players where doIplay is set to true
@@ -147,6 +150,12 @@ class CurrentPlayers extends ChangeNotifier {
     }
     _isButtonDisabled = count < 2;
 
+    notifyListeners();
+  }
+
+  // enable button after dealer
+  void gotDealer() {
+    _dealerFlag = true;
     notifyListeners();
   }
 
@@ -363,6 +372,7 @@ class CurrentPlayers extends ChangeNotifier {
     _round = 1;
     _numberOfCards = 1;
     _lastRound = false;
+    _dealerFlag = false;
     notifyListeners();
   }
 }
