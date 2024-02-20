@@ -42,7 +42,7 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
           const Text(
             'Nuevo jugador',
             style: TextStyle(
-              color: Colors.white,
+              color: CustomColors.whiteColor,
               fontSize: 22.0,
               fontWeight: FontWeight.w500,
             ),

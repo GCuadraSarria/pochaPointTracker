@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/first_steps/dealer_players_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
+import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
 class SortPlayersPage extends StatefulWidget {
@@ -12,8 +13,6 @@ class SortPlayersPage extends StatefulWidget {
 }
 
 class _SortPlayersPageState extends State<SortPlayersPage> {
-
-
   @override
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();
@@ -22,77 +21,91 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
       builder: (context, value, child) => SafeArea(
         child: Scaffold(
           // avoids keyboard pushing bottom content
-          body: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                  child: Row(
-                    children: [
-                      Transform.scale(
-                        scale: 0.5,
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          child:
-                              Image.asset('lib/assets/icons/step_icon_2.png'),
-                        ),
-                      ),
-                      const Text(
-                        '¿En qué orden jugaréis?',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10.0),
-
-                // reorderable players list
-                Expanded(
-                  child: ReorderableListView(
-                    onReorder: (int oldIndex, int newIndex) =>
-                        currentPlayersProvider.sortCurrentPlayer(
-                            oldIndex, newIndex),
-                    children: [
-                      for (final player
-                          in currentPlayersProvider.currentPlayers)
-                        ListTile(
-                          key: ValueKey(player),
-                          leading: const Icon(Icons.reorder),
-                          title: Text(
-                            player.playerName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  Color.fromARGB(255, 54, 18, 77),
+                  CustomColors.backgroundColor
+                ],
+                stops: [
+                  0.0,
+                  0.9,
+                ],
+              ),
+            ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Row(
+                      children: [
+                        Transform.scale(
+                          scale: 0.5,
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            child:
+                                Image.asset('lib/assets/icons/step_icon_2.png'),
                           ),
                         ),
-                    ],
+                        const Text(
+                          '¿En qué orden jugaréis?',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Spacer(),
+                  const SizedBox(height: 10.0),
 
-                // back and next buttons
-                const GoBackButton(),
-                CustomButton(
-                  text: 'Ir a ver quien reparte',
-                  width: 340.0,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DealerPlayersPage()),
-                    );
-                  },
-                ),
-              ],
+                  // reorderable players list
+                  Expanded(
+                    child: ReorderableListView(
+                      onReorder: (int oldIndex, int newIndex) =>
+                          currentPlayersProvider.sortCurrentPlayer(
+                              oldIndex, newIndex),
+                      children: [
+                        for (final player
+                            in currentPlayersProvider.currentPlayers)
+                          ListTile(
+                            key: ValueKey(player),
+                            leading: const Icon(Icons.reorder),
+                            title: Text(
+                              player.playerName,
+                              style: const TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+
+                  // back and next buttons
+                  const GoBackButton(),
+                  CustomButton(
+                    text: 'Ir a ver quien reparte',
+                    width: 340.0,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const DealerPlayersPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -3,7 +3,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
-
 import '../../provider/provider.dart';
 import '../../widgets/widgets.dart';
 
@@ -117,9 +116,9 @@ class GameDetailsPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Estadísticas partida',
+                          'Clasificación de la partida',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: CustomColors.whiteColor,
                             fontSize: 24.0,
                             fontWeight: FontWeight.w500,
                           ),
@@ -162,8 +161,8 @@ class GameDetailsPage extends StatelessWidget {
                       'Volver al menú',
                       style: TextStyle(
                         decoration: TextDecoration.underline,
-                        decorationColor: Colors.white,
-                        color: Colors.white,
+                        decorationColor: CustomColors.whiteColor,
+                        color: CustomColors.whiteColor,
                         fontSize: 20.0,
                         fontWeight: FontWeight.w500,
                       ),

@@ -3,6 +3,7 @@ import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
 class ConfigurationPage extends StatefulWidget {
@@ -14,9 +15,16 @@ class ConfigurationPage extends StatefulWidget {
 
 class _ConfigurationPageState extends State<ConfigurationPage> {
   // local india state
-  bool? localIndiaState;
+  late bool localIndiaState;
   // local round state
-  int? localRoundState;
+  late int localRoundState;
+
+  @override
+  void initState() {
+    super.initState();
+    localIndiaState = context.read<CurrentPlayers>().wePlayIndia;
+    localRoundState = context.read<CurrentPlayers>().maxCards;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,100 +38,113 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
         child: Scaffold(
-          body: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 18.0),
-                  child: Row(
+          body: Container(
+            decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                Color.fromARGB(255, 54, 18, 77),
+                CustomColors.backgroundColor
+              ],
+              stops: [
+                0.0,
+                0.9,
+              ],
+            ),
+          ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Configurar partida',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Configurar partida',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Text(
+                          '¿Cuántas rondas queréis jugar?',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 10.0),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18.0),
-                      child: Text(
-                        '¿Cuántas rondas queréis jugar?',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w400,
+                  // round selector
+                  SizedBox(
+                    height: 75.0,
+                    width: 250.0,
+                    child: HorizontalNumberSelectorConfig(
+                        initialRoundState: initialRoundState,
+                        onChanged: (int value) {
+                          setState(() {
+                            localRoundState = value;
+                          });
+                        }),
+                  ),
+                  const SizedBox(height: 24.0),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Text(
+                          '¿Queréis jugar la mano ciega?',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // round selector
-                SizedBox(
-                  height: 75.0,
-                  width: 250.0,
-                  child: HorizontalNumberSelectorConfig(
-                      initialRoundState: initialRoundState,
-                      onChanged: (int value) {
-                        setState(() {
-                          localRoundState = value;
-                        });
-                      }),
-                ),
-                const SizedBox(height: 24.0),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 18.0),
-                      child: Text(
-                        '¿Queréis jugar la mano ciega?',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                RadioButtons(
-                  initialPlayWithIndiaState: initialPlayWithIndiaState,
-                  onChanged: (bool value) {
-                    setState(() {
-                      localIndiaState = value;
-                    });
-                  },
-                ),
-                const Spacer(),
-
-                // back and next buttons
-                const GoBackButton(btnText: 'Cancelar'),
-                CustomButton(
-                  text: 'Guardar Cambios',
-                  width: 340.0,
-                  isDisabled: localIndiaState == null && localRoundState == null,
-                  onPressed: () {
-                    // apply changes based on the desired variables
-                    currentPlayersProvider.setPlayWithIndia(localIndiaState);
-                    currentPlayersProvider.setMaxCards(localRoundState!);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomePage()),
-                    );
-                  },
-                ),
-              ],
+                    ],
+                  ),
+                  RadioButtons(
+                    initialPlayWithIndiaState: initialPlayWithIndiaState,
+                    onChanged: (bool value) {
+                      setState(() {
+                        localIndiaState = value;
+                      });
+                    },
+                  ),
+                  const Spacer(),
+            
+                  // back and next buttons
+                  const GoBackButton(btnText: 'Cancelar'),
+                  CustomButton(
+                    text: 'Guardar Cambios',
+                    width: 340.0,
+                    onPressed: () {
+                      // apply changes based on the desired variables
+                      currentPlayersProvider.setPlayWithIndia(localIndiaState);
+                      currentPlayersProvider.setMaxCards(localRoundState);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -197,7 +218,7 @@ Widget _buildItemList(BuildContext context, int index) {
       child: Text(
         '${roundList[index]}',
         style: const TextStyle(
-          color: Colors.white,
+          color: CustomColors.whiteColor,
           fontSize: 50.0,
           fontWeight: FontWeight.bold,
         ),
@@ -221,12 +242,12 @@ class RadioButtons extends StatefulWidget {
 }
 
 class _RadioButtonsState extends State<RadioButtons> {
-  bool? _selectedValue;
+  late bool _selectedValue;
 
   @override
   void initState() {
     super.initState();
-    _selectedValue = widget.initialPlayWithIndiaState;
+    _selectedValue = widget.initialPlayWithIndiaState!;
   }
 
   @override
@@ -240,7 +261,7 @@ class _RadioButtonsState extends State<RadioButtons> {
             groupValue: _selectedValue,
             onChanged: (bool? value) {
               setState(() {
-                _selectedValue = value;
+                _selectedValue = value!;
                 widget.onChanged(true);
               });
             },
@@ -253,7 +274,7 @@ class _RadioButtonsState extends State<RadioButtons> {
             groupValue: _selectedValue,
             onChanged: (bool? value) {
               setState(() {
-                _selectedValue = value;
+                _selectedValue = value!;
                 widget.onChanged(false);
               });
             },

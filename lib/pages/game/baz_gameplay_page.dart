@@ -3,7 +3,6 @@ import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/pages/game/winner_gameplay_page.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
-
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
@@ -39,139 +38,154 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
         child: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  Color.fromARGB(255, 54, 18, 77),
+                  CustomColors.backgroundColor
+                ],
+                stops: [
+                  0.0,
+                  0.9,
+                ],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.more_vert,
-                          size: 32.0,
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.more_vert,
+                            size: 32.0,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        ' | ',
-                        style: TextStyle(
-                          color: CustomColors.primaryColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                        const Text(
+                          ' | ',
+                          style: TextStyle(
+                            color: CustomColors.primaryColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        'Reparte: ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
+                        const Text(
+                          'Reparte: ',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        currentPlayersProvider.currentPlayers.last.playerName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          currentPlayersProvider.currentPlayers.last.playerName,
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12.0),
-                const Divider(
-                  thickness: 1.5,
-                  color: CustomColors.primaryColor,
-                ),
-                const SizedBox(height: 16.0),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Bazas ganadas',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 12.0),
+                  const Divider(
+                    thickness: 1.5,
+                    color: CustomColors.primaryColor,
                   ),
-                ),
-                const SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Bazas ganadas',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
 
-                // Containers of each player
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: currentPlayersProvider.currentPlayers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: PlayerBazContainer(playerIndex: index),
-                        );
-                      }),
-                ),
-                // back and next buttons
-                const GoBackButton(),
-                CustomButton(
-                  text: currentPlayersProvider.lastRound
-                      ? 'Finalizar partida'
-                      : 'Siguente ronda',
-                  width: 340.0,
-                  isDisabled: !currentPlayersProvider.didAllPlayersBaz,
-                  onPressed: !currentPlayersProvider.lastRound
-                      ? () {
-                          //not last round,
-                          currentPlayersProvider.nextRound();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const VoteGameplayPage(),
-                            ),
+                  // Containers of each player
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: currentPlayersProvider.currentPlayers.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: PlayerBazContainer(playerIndex: index),
                           );
-                        }
-                      : () {
-                          //last round,
-                          currentPlayersProvider.finishGame();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const WinnerGameplayPage(),
-                            ),
-                          );
-                        },
-                ),
-              ],
+                        }),
+                  ),
+                  // back and next buttons
+                  const GoBackButton(),
+                  CustomButton(
+                    text: currentPlayersProvider.lastRound
+                        ? 'Finalizar partida'
+                        : 'Siguente ronda',
+                    width: 340.0,
+                    isDisabled: !currentPlayersProvider.didAllPlayersBaz,
+                    onPressed: !currentPlayersProvider.lastRound
+                        ? () {
+                            //not last round,
+                            currentPlayersProvider.nextRound();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const VoteGameplayPage(),
+                              ),
+                            );
+                          }
+                        : () {
+                            //last round,
+                            currentPlayersProvider.finishGame();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const WinnerGameplayPage(),
+                              ),
+                            );
+                          },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -226,7 +240,7 @@ class PlayerBazContainer extends StatelessWidget {
           height: 120.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: Colors.white, width: 1.5),
+            border: Border.all(color: CustomColors.whiteColor, width: 1.5),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -239,7 +253,7 @@ class PlayerBazContainer extends StatelessWidget {
                       currentPlayersProvider
                           .currentPlayers[playerIndex].playerName,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: CustomColors.whiteColor,
                         fontSize: 22.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -252,7 +266,7 @@ class PlayerBazContainer extends StatelessWidget {
                     Text(
                       '${currentPlayersProvider.currentPlayers[playerIndex].score}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: CustomColors.whiteColor,
                         fontSize: 22.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -274,7 +288,7 @@ class PlayerBazContainer extends StatelessWidget {
                             currentPlayersProvider
                                 .currentPlayers[playerIndex].vote,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: CustomColors.whiteColor,
                               fontSize: 40.0,
                               fontWeight: FontWeight.bold,
                             ),
@@ -350,7 +364,7 @@ Widget _buildItemList(BuildContext context, int index) {
       child: Text(
         currentPlayersProvider.scrollableNumberList[index],
         style: const TextStyle(
-          color: Colors.white,
+          color: CustomColors.whiteColor,
           fontSize: 40.0,
           fontWeight: FontWeight.bold,
         ),

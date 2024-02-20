@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/theme.dart';
+
 class GoBackButton extends StatelessWidget {
   final String btnText;
   const GoBackButton({
@@ -15,8 +17,8 @@ class GoBackButton extends StatelessWidget {
         btnText,
         style: const TextStyle(
           decoration: TextDecoration.underline,
-          decorationColor: Colors.white,
-          color: Colors.white,
+          decorationColor: CustomColors.whiteColor,
+          color: CustomColors.whiteColor,
           fontSize: 20.0,
           fontWeight: FontWeight.w500,
         ),

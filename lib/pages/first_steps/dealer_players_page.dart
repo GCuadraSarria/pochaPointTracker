@@ -1,9 +1,7 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:random_text_reveal/random_text_reveal.dart';
-
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
@@ -39,55 +37,69 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
         child: Scaffold(
-          body: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                  child: Row(
-                    children: [
-                      Transform.scale(
-                        scale: 0.5,
-                        alignment: Alignment.centerLeft,
-                        child: SizedBox(
-                          child:
-                              Image.asset('lib/assets/icons/step_icon_3.png'),
-                        ),
-                      ),
-                      const Text(
-                        '¿Quién va a repartir?',
-                        style: TextStyle(
-                          color: CustomColors.whiteColor,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                // players list animation
-                const RandomTextDecode(),
-                const Spacer(),
-
-                // back and next buttons
-                const GoBackButton(),
-                CustomButton(
-                  text: 'Empezar partida',
-                  width: 340.0,
-                  isDisabled: !currentPlayersProvider.dealerFlag,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const VoteGameplayPage()),
-                    );
-                  },
-                ),
+          body: Container(
+            decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                Color.fromARGB(255, 54, 18, 77),
+                CustomColors.backgroundColor
               ],
+              stops: [
+                0.0,
+                0.9,
+              ],
+            ),
+          ),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Row(
+                      children: [
+                        Transform.scale(
+                          scale: 0.5,
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            child:
+                                Image.asset('lib/assets/icons/step_icon_3.png'),
+                          ),
+                        ),
+                        const Text(
+                          '¿Quién va a repartir?',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  // players list animation
+                  const RandomTextDecode(),
+                  const Spacer(),
+            
+                  // back and next buttons
+                  const GoBackButton(),
+                  CustomButton(
+                    text: 'Empezar partida',
+                    width: 340.0,
+                    isDisabled: !currentPlayersProvider.dealerFlag,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const VoteGameplayPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -111,7 +123,6 @@ class RandomTextDecode extends StatelessWidget {
 
     // method that randomize a player to be the dealer
     void randomPlayer() {
-      print('we did it bro');
       // generate random number to get index
       final random = Random();
       int randomIndex =

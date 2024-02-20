@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/provider/provider.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
-import 'package:provider/provider.dart';
 
 class PlayerRankingTile extends StatefulWidget {
+  final int index;
   final String playerName;
-  final int gamesPlayed;
-  final int winGames;
-  final double gamesWinRate;
+  final dynamic sortingInformation;
 
   const PlayerRankingTile({
     super.key,
+    required this.index,
     required this.playerName,
-    required this.gamesPlayed,
-    required this.winGames,
-    required this.gamesWinRate,
+    required this.sortingInformation,
   });
 
   @override
@@ -23,7 +20,7 @@ class PlayerRankingTile extends StatefulWidget {
 }
 
 class _PlayerRankingTileState extends State<PlayerRankingTile> {
-// firestore service
+  // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
   @override
@@ -33,64 +30,62 @@ class _PlayerRankingTileState extends State<PlayerRankingTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<CurrentPlayers>(
-      builder: (context, value, child) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-        child: Container(
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: CustomColors.whiteColor, width: 0.5),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 6.0),
+      child: Container(
+        height: 60.0,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        decoration: widget.index != 0
+            ? BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: CustomColors.whiteColor, width: 1.5),
+              )
+            : BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    CustomColors.primaryColor,
+                    CustomColors.secondaryColor,
+                  ],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                widget.index != 0
+                    ? Text(
+                        '#${widget.index + 1}',
+                        style: const TextStyle(
+                          color: CustomColors.whiteColor,
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.w200,
+                        ),
+                      )
+                    : SvgPicture.asset('lib/assets/images/mini_cup.svg',
+                        height: 18.0, width: 18.0, semanticsLabel: 'mini cup'),
+                const SizedBox(width: 8.0),
+                Text(
                   widget.playerName,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w400,
+                    color: CustomColors.whiteColor,
+                    fontSize: 22.0,
                   ),
                 ),
+              ],
+            ),
+            Text(
+              '${widget.sortingInformation}',
+              style: const TextStyle(
+                color: CustomColors.whiteColor,
+                fontSize: 22.0,
               ),
-              Expanded(
-                child: Text(
-                  '${widget.gamesPlayed}',
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  '${widget.winGames}',
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  '${widget.gamesWinRate}%',
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

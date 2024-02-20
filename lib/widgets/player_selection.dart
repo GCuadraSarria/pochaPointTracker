@@ -55,7 +55,7 @@ class _PlayerSelectionState extends State<PlayerSelection> {
           Text(
             widget.playerName,
             style: const TextStyle(
-              color: Colors.white,
+              color: CustomColors.whiteColor,
               fontSize: 20.0,
               fontWeight: FontWeight.w400,
             ),

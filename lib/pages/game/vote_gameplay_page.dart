@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/game/baz_gameplay_page.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
-
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
@@ -37,122 +36,136 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
         child: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.more_vert,
-                          size: 32.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Text(
-                        ' | ',
-                        style: TextStyle(
-                          color: CustomColors.primaryColor,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Text(
-                        'Reparte: ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        currentPlayersProvider.currentPlayers.last.playerName,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12.0),
-                const Divider(
-                  thickness: 1.5,
-                  color: CustomColors.primaryColor,
-                ),
-                const SizedBox(height: 16.0),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Apuestas',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16.0),
-
-                // Containers of each player
-                Expanded(
-                  child: ListView.builder(
-                      itemCount: currentPlayersProvider.currentPlayers.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: PlayerVoteContainer(playerIndex: index),
-                        );
-                      }),
-                ),
-                // next button
-                CustomButton(
-                  text: 'Bazas',
-                  width: 340.0,
-                  isDisabled: !currentPlayersProvider.didAllPlayersVote,
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const BazGameplayPage()),
-                    );
-                  },
-                ),
+          body: Container(
+            decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              colors: [
+                Color.fromARGB(255, 54, 18, 77),
+                CustomColors.backgroundColor
               ],
+              stops: [
+                0.0,
+                0.9,
+              ],
+            ),
+          ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.more_vert,
+                            size: 32.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Text(
+                          ' | ',
+                          style: TextStyle(
+                            color: CustomColors.primaryColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const Text(
+                          'Reparte: ',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          currentPlayersProvider.currentPlayers.last.playerName,
+                          style: const TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12.0),
+                  const Divider(
+                    thickness: 1.5,
+                    color: CustomColors.primaryColor,
+                  ),
+                  const SizedBox(height: 16.0),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Apuestas',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+            
+                  // Containers of each player
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: currentPlayersProvider.currentPlayers.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: PlayerVoteContainer(playerIndex: index),
+                          );
+                        }),
+                  ),
+                  // next button
+                  CustomButton(
+                    text: 'Bazas',
+                    width: 340.0,
+                    isDisabled: !currentPlayersProvider.didAllPlayersVote,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const BazGameplayPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -180,7 +193,7 @@ class PlayerVoteContainer extends StatelessWidget {
           height: 120.0,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: Colors.white, width: 1.5),
+            border: Border.all(color: CustomColors.whiteColor, width: 1.5),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -193,7 +206,7 @@ class PlayerVoteContainer extends StatelessWidget {
                       currentPlayersProvider
                           .currentPlayers[playerIndex].playerName,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: CustomColors.whiteColor,
                         fontSize: 22.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -203,7 +216,7 @@ class PlayerVoteContainer extends StatelessWidget {
                     Text(
                       '${currentPlayersProvider.currentPlayers[playerIndex].score}',
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: CustomColors.whiteColor,
                         fontSize: 22.0,
                         fontWeight: FontWeight.w500,
                       ),
@@ -282,7 +295,7 @@ Widget _buildItemList(BuildContext context, int index) {
       child: Text(
         currentPlayersProvider.scrollableNumberList[index],
         style: const TextStyle(
-          color: Colors.white,
+          color: CustomColors.whiteColor,
           fontSize: 40.0,
           fontWeight: FontWeight.bold,
         ),

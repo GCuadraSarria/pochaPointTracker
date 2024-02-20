@@ -47,6 +47,15 @@ class FirestoreService {
     }
   }
 
+  // READ: get number of players
+  Future<int> getPlayerCount() async {
+    // Get a snapshot of all documents in the collection
+    QuerySnapshot snapshot = await players.get();
+
+    // Return the number of documents in the snapshot
+    return snapshot.size;
+  }
+
   // UPDATE: update players based on name
   Future<void> updatePlayer(String playerName, int score, bool winner) async {
     try {
@@ -128,8 +137,7 @@ class FirestoreService {
       // Check if the playerName is not empty or null
 
       // Query Firestore to find the document where the name matches the provided playerName
-      QuerySnapshot querySnapshot =
-          await players.get();
+      QuerySnapshot querySnapshot = await players.get();
 
       // Iterate over the documents in the query snapshot
       for (var doc in querySnapshot.docs) {

@@ -33,7 +33,7 @@ class CurrentPlayers extends ChangeNotifier {
   int _totalBaz = 0;
   int get totalBaz => _totalBaz;
 
-  String _sortingRank = 'playerName';
+  String _sortingRank = 'gamesPlayed';
   String get sortingRank => _sortingRank;
 
   List<String> _scrollableNumberList = ['-', '0', '1'];
@@ -56,6 +56,10 @@ class CurrentPlayers extends ChangeNotifier {
 
   bool _dealerFlag = false;
   bool get dealerFlag => _dealerFlag;
+
+  int _totalPlayersFilter = 0;
+  int get totalPlayersFilter => _totalPlayersFilter;
+
 
   // add a player to the new game
   Future<void> addPlayers() async {
@@ -94,6 +98,12 @@ class CurrentPlayers extends ChangeNotifier {
     // Update the _currentPlayers list
     _currentPlayers = updatedPlayers;
 
+    notifyListeners();
+  }
+
+  // get number of players filtered
+  void filteredPlayers(int amountFiltered) {
+    _totalPlayersFilter = amountFiltered;
     notifyListeners();
   }
 
@@ -240,6 +250,7 @@ class CurrentPlayers extends ChangeNotifier {
       // if we are in the last round and we play india we add another round and set lastRound = true
     } else if (_wePlayIndia == false && _maxCards * 2 == _round) {
       _lastRound = true;
+      removeCardsToTheRound();
 
       // if max cards are smaller than the round that means we are ahead of half of the game
     } else if (_maxCards < _round) {
@@ -358,6 +369,7 @@ class CurrentPlayers extends ChangeNotifier {
     notifyListeners();
   }
 
+  // restart game, default values
   void restartGame() {
     _currentPlayers = [];
     _scrollableNumberList = ['-', '0', '1'];
