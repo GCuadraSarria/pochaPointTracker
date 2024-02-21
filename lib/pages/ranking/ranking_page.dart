@@ -159,19 +159,16 @@ class _RankingPageState extends State<RankingPage> {
                       children: [
                         StreamBuilder<QuerySnapshot>(
                           // get players and their stats
-                          stream: firestoreService.showPlayersInfoSorted(
-                              currentPlayersProvider.sortingRank),
+                          stream: firestoreService
+                              .getPlayersWithSelectionRankChecked(),
                           builder: (context, snapshot) {
                             // if we have data, get all docs
                             if (snapshot.hasData) {
                               List playersList = snapshot.data!.docs;
-                              // set number of players in the list
-                              currentPlayersProvider
-                                  .filteredPlayers(playersList.length);
 
                               // display as a list
                               return Text(
-                                ('Jugadores (${currentPlayersProvider.totalPlayersFilter})'),
+                                ('Jugadores (${playersList.length})'),
                                 style: const TextStyle(
                                   color: CustomColors.whiteColor,
                                   fontSize: 20.0,
@@ -185,14 +182,21 @@ class _RankingPageState extends State<RankingPage> {
                           },
                         ),
                         TextButton(
-                          onPressed: () => print('select'),
+                          onPressed: () {
+                            // select player dialog
+                            showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  const SelectPlayersDialogbox(),
+                            );
+                          },
                           child: const Text(
                             'Seleccionar',
                             style: TextStyle(
                               decoration: TextDecoration.underline,
                               decorationColor: CustomColors.whiteColor,
                               color: CustomColors.whiteColor,
-                              fontSize: 20.0,
+                              fontSize: 18.0,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -205,8 +209,8 @@ class _RankingPageState extends State<RankingPage> {
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
                       // get players and their stats
-                      stream: firestoreService.showPlayersInfoSorted(
-                          currentPlayersProvider.sortingRank),
+                      stream:
+                          firestoreService.getPlayersWithSelectionRankChecked(),
                       builder: (context, snapshot) {
                         // if we have data, get all docs
                         if (snapshot.hasData) {

@@ -25,6 +25,7 @@ class FirestoreService {
         'winGames': 0,
         'gamesWinRate': 0,
         'doIplay': false,
+        'selectionRank': true,
       });
       // ignore: avoid_print
       print('Player added to Firestore successfully.');
@@ -45,6 +46,53 @@ class FirestoreService {
           players.orderBy(sortValue, descending: true).snapshots();
       return playersStream;
     }
+  }
+
+  // READ: get players to show the info
+  Stream<QuerySnapshot> getPlayers(String sortValue) {
+    if (sortValue == 'playerName') {
+      final Stream<QuerySnapshot> playersStream =
+          players.orderBy(sortValue, descending: false).snapshots();
+      return playersStream;
+    } else {
+      final Stream<QuerySnapshot> playersStream =
+          players.orderBy(sortValue, descending: true).snapshots();
+      return playersStream;
+    }
+  }
+
+  // READ: get players with selectionRank checked
+  Stream<QuerySnapshot> getPlayersWithSelectionRankChecked() {
+    final Stream<QuerySnapshot> playersStream =
+        players.where('selectionRank', isEqualTo: true).snapshots();
+    return playersStream;
+  }
+
+  // READ: get players name
+  Future<List<String>> getPlayersName() async {
+    List<String> playerSetList = [];
+    // get players which selection is true
+    QuerySnapshot querySnapshot = await players.get();
+    // Iterate over the documents in the query snapshot
+    for (var doc in querySnapshot.docs) {
+      // Access the player's stats from the document data
+      Map<String, dynamic> playerData = doc.data() as Map<String, dynamic>;
+
+      // Extract the required stats from the player's data
+      String playerName = playerData['playerName'] ?? '';
+
+      playerSetList.add(playerName);
+    }
+    return playerSetList;
+  }
+
+  // READ: get players list with rank checked
+  Stream<QuerySnapshot> getPlayersListWithRankChecked() {
+    // get players which selection is true
+    final Stream<QuerySnapshot> querySnapshot =
+        players.where('selectionRank', isEqualTo: true).snapshots();
+
+    return querySnapshot;
   }
 
   // READ: get number of players
@@ -128,6 +176,49 @@ class FirestoreService {
     } catch (error) {
       // ignore: avoid_print
       print('Error updating doIplay: $error');
+    }
+  }
+
+  // UPDATE: update players selection rank
+  Future<void> playerSelection(String playerName, bool value) async {
+    try {
+      // Check if the playerName is not empty or null
+      if (playerName.isNotEmpty) {
+        // Query Firestore to find the document where the name matches the provided playerName
+        QuerySnapshot querySnapshot =
+            await players.where('playerName', isEqualTo: playerName).get();
+
+        // Iterate over the documents in the query snapshot
+        for (var doc in querySnapshot.docs) {
+          // Update the player's do I play when we check
+          await doc.reference.update({
+            'selectionRank': value,
+          });
+        }
+      } else {
+        // ignore: avoid_print
+        print('Invalid player name.');
+      }
+    } catch (error) {
+      // ignore: avoid_print
+      print('Error updating doIplay: $error');
+    }
+  }
+
+  // UPDATE: select / unselect all
+  Future<void> selectAll(bool selection) async {
+    try {
+      // Query Firestore to get all the documents
+      QuerySnapshot querySnapshot = await players.get();
+
+      // Iterate over the documents in the query snapshot
+      for (var doc in querySnapshot.docs) {
+        // Update the player's stats based on the provided data
+        await doc.reference.update({'selectionRank': selection});
+      }
+    } catch (error) {
+      // ignore: avoid_print
+      print('Error updating player stats: $error');
     }
   }
 

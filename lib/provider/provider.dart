@@ -60,7 +60,6 @@ class CurrentPlayers extends ChangeNotifier {
   int _totalPlayersFilter = 0;
   int get totalPlayersFilter => _totalPlayersFilter;
 
-
   // add a player to the new game
   Future<void> addPlayers() async {
     // we filter all players where doIplay is set to true

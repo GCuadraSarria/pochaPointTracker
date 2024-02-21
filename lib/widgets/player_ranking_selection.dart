@@ -4,22 +4,22 @@ import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
-class PlayerSelection extends StatefulWidget {
+class PlayerRankingSelection extends StatefulWidget {
   final String playerName;
-  final bool playerDoPlay;
+  final bool selectionRank;
 
-  const PlayerSelection({
+  const PlayerRankingSelection({
     super.key,
     required this.playerName,
-    required this.playerDoPlay,
+    required this.selectionRank,
   });
 
   @override
-  State<PlayerSelection> createState() => _PlayerSelectionState();
+  State<PlayerRankingSelection> createState() => _PlayerRankingSelectionState();
 }
 
-class _PlayerSelectionState extends State<PlayerSelection> {
-// firestore service
+class _PlayerRankingSelectionState extends State<PlayerRankingSelection> {
+  // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
   @override
@@ -40,14 +40,11 @@ class _PlayerSelectionState extends State<PlayerSelection> {
             alignment: Alignment.centerLeft,
             child: Checkbox(
               activeColor: CustomColors.secondaryColor,
-              value: widget.playerDoPlay,
+              value: widget.selectionRank,
               onChanged: (bool? value) {
                 setState(() {
-                  // update doIplay bool
-                  firestoreService.doPlayerPlay(widget.playerName);
-                  // update button
-                  currentPlayersProvider.enableButtonToSortPlayers(
-                      widget.playerName, value);
+                  // update rank check bool
+                  firestoreService.playerSelection(widget.playerName, value!);
                 });
               },
             ),

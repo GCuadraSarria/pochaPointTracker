@@ -23,18 +23,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontFamily: 'Roboto'),
-          bodyMedium: TextStyle(fontFamily: 'Roboto'),
-          displayLarge: TextStyle(fontFamily: 'Roboto'), 
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(fontFamily: 'Roboto'),
+            bodyMedium: TextStyle(fontFamily: 'Roboto'),
+            displayLarge: TextStyle(fontFamily: 'Roboto'),
+          ),
         ),
-      ),
 
-      home: const HomePage(),
-      // home: const WinnerGameplayPage(),
+        home: const HomePage(),
+        // home: const WinnerGameplayPage(),
+      
     );
   }
 }
