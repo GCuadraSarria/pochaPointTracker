@@ -131,11 +131,9 @@ class _RankingPageState extends State<RankingPage> {
                             borderRadius: BorderRadius.circular(8.0),
                             value: selectedSort,
                             onChanged: (SortLabel? sort) {
-                              setState(() {
-                                selectedSort = sort;
-                                currentPlayersProvider
-                                    .setSortingRank(sort!.value);
-                              });
+                              selectedSort = sort;
+                              currentPlayersProvider
+                                  .setSortingRank(sort!.value);
                             },
                             items: SortLabel.values
                                 .map<DropdownMenuItem<SortLabel>>(
@@ -159,9 +157,13 @@ class _RankingPageState extends State<RankingPage> {
                       children: [
                         StreamBuilder<QuerySnapshot>(
                           // get players and their stats
-                          stream: firestoreService
-                              .getPlayersWithSelectionRankChecked(),
+                          stream: firestoreService.getPlayersSorted(
+                              currentPlayersProvider.sortingRank),
                           builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const LoadingProgress();
+                            }
                             // if we have data, get all docs
                             if (snapshot.hasData) {
                               List playersList = snapshot.data!.docs;
@@ -177,7 +179,7 @@ class _RankingPageState extends State<RankingPage> {
                               );
                               // if there is no data return nothing
                             } else {
-                              return const LoadingProgress();
+                              return const SizedBox();
                             }
                           },
                         ),
@@ -209,9 +211,14 @@ class _RankingPageState extends State<RankingPage> {
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
                       // get players and their stats
-                      stream:
-                          firestoreService.getPlayersWithSelectionRankChecked(),
+                      stream: firestoreService
+                          .getPlayersSorted(currentPlayersProvider.sortingRank),
                       builder: (context, snapshot) {
+                        // if we are waiting for data, show loading progress
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const LoadingProgress();
+                        }
                         // if we have data, get all docs
                         if (snapshot.hasData) {
                           List playersList = snapshot.data!.docs;
@@ -230,7 +237,7 @@ class _RankingPageState extends State<RankingPage> {
                                 Map<String, dynamic> data =
                                     document.data() as Map<String, dynamic>;
                                 String playerName = data['playerName'];
-                                dynamic sortingInfo =
+                                String sortingInfo =
                                     currentPlayersProvider.sortingRank;
 
                                 // display as a list tile
@@ -242,12 +249,11 @@ class _RankingPageState extends State<RankingPage> {
                               });
                           // if there is no data return nothing
                         } else {
-                          return const LoadingProgress();
+                          return const SizedBox();
                         }
                       },
                     ),
                   ),
-                  const Spacer(),
 
                   // back and next buttons
                   const GoBackButton(),

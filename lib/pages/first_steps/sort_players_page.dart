@@ -97,6 +97,7 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                     text: 'Ir a ver quien reparte',
                     width: 340.0,
                     onPressed: () {
+                      //TODO: Randomize here
                       Navigator.push(
                         context,
                         MaterialPageRoute(

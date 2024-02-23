@@ -5,10 +5,13 @@ import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:provider/provider.dart';
 
 import 'pages/pages.dart';
+import 'services/starting_value.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Set default value for all users
+  await setDefaultValueForAllPlayers();
   runApp(
     ChangeNotifierProvider(
       create: (context) => CurrentPlayers(),
@@ -23,19 +26,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(fontFamily: 'Roboto'),
-            bodyMedium: TextStyle(fontFamily: 'Roboto'),
-            displayLarge: TextStyle(fontFamily: 'Roboto'),
-          ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Roboto'),
+          bodyMedium: TextStyle(fontFamily: 'Roboto'),
+          displayLarge: TextStyle(fontFamily: 'Roboto'),
         ),
+      ),
 
-        home: const HomePage(),
-        // home: const WinnerGameplayPage(),
-      
+      home: const HomePage(),
+      // home: const WinnerGameplayPage(),
     );
   }
 }

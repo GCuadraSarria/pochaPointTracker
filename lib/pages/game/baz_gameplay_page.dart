@@ -334,8 +334,6 @@ class _HorizontalNumberSelectorBazState
       itemBuilder: _buildItemList,
       itemCount: currentPlayersProvider.scrollableNumberList.length,
       itemSize: 40.0,
-      margin: const EdgeInsets.symmetric(horizontal: 0.5),
-      dynamicItemSize: true,
       onItemFocus: (index) {
         // find the matching player and modify baz according
         // to the selected numberList
@@ -344,14 +342,23 @@ class _HorizontalNumberSelectorBazState
               (player) => player.playerName == widget.currentPlayer,
             )
             .baz = currentPlayersProvider.scrollableNumberList[index];
-
+    
         // check if everybody baz
         currentPlayersProvider.checkIfAllPlayersBaz();
-
+    
         // modify points based on the selection
         currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
       },
       dynamicItemOpacity: 0.4,
+      dynamicItemSize: true,
+      dynamicSizeEquation: (value) {
+        // Make the immediate neighbors of the focused item smaller
+        if (value == 0) {
+          return 1;
+        } else {
+          return 0.8;
+        }
+      },
     );
   }
 }

@@ -39,7 +39,6 @@ dependencies:
   cloud_firestore: ^4.13.3
   google_fonts: ^6.1.0
   provider:
-  flutter_slot_machine: ^0.0.1
   scroll_snap_list: ^0.9.1
   random_text_reveal: ^0.0.7
   flutter_svg: ^2.0.9

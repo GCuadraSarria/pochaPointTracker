@@ -46,7 +46,6 @@ class _SelectPlayersDialogboxState extends State<SelectPlayersDialogbox> {
               ),
             ),
             child: Dialog.fullscreen(
-              backgroundColor: Colors.transparent,
               child: Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 20.0, vertical: 24.0),

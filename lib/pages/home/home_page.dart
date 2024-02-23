@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/custom_button.dart';
@@ -30,11 +31,9 @@ class HomePage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Spacer(),
-                  Container(
-                      height: 213.0,
-                      width: 213.0,
-                      color: const Color(0xFFD9D9D9)),
-                  const SizedBox(height: 67.0),
+                  SvgPicture.asset('lib/assets/images/logo_pocha.svg',                              
+                              semanticsLabel: 'logo'),
+                  const SizedBox(height: 80.0),
                   CustomButton(
                     text: 'Iniciar partida',
                     width: 294.0,

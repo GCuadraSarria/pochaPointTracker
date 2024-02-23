@@ -27,7 +27,6 @@ class _DealerPlayersPageState extends State<DealerPlayersPage> {
     setState(() {
       ableButton = true;
     });
-    debugPrint('able button: $ableButton');
   }
 
   @override
@@ -126,7 +125,7 @@ class RandomTextDecode extends StatelessWidget {
       // generate random number to get index
       final random = Random();
       int randomIndex =
-          random.nextInt(currentPlayersProvider.currentPlayers.length - 1);
+          random.nextInt(currentPlayersProvider.currentPlayers.length);
       // return name based on the index
       dealer = currentPlayersProvider.currentPlayers[randomIndex].playerName;
     }

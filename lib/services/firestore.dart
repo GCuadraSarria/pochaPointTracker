@@ -26,6 +26,7 @@ class FirestoreService {
         'gamesWinRate': 0,
         'doIplay': false,
         'selectionRank': true,
+        'maxPoints': -100,
       });
       // ignore: avoid_print
       print('Player added to Firestore successfully.');
@@ -48,24 +49,17 @@ class FirestoreService {
     }
   }
 
-  // READ: get players to show the info
-  Stream<QuerySnapshot> getPlayers(String sortValue) {
+  // READ: get players to show the info where the checkbox is true
+  Stream<QuerySnapshot> getPlayersSorted(String sortValue) {
     if (sortValue == 'playerName') {
       final Stream<QuerySnapshot> playersStream =
-          players.orderBy(sortValue, descending: false).snapshots();
+          players.orderBy(sortValue, descending: false).where('selectionRank', isEqualTo: true).snapshots();
       return playersStream;
     } else {
       final Stream<QuerySnapshot> playersStream =
-          players.orderBy(sortValue, descending: true).snapshots();
+          players.orderBy(sortValue, descending: true).where('selectionRank', isEqualTo: true).snapshots();
       return playersStream;
     }
-  }
-
-  // READ: get players with selectionRank checked
-  Stream<QuerySnapshot> getPlayersWithSelectionRankChecked() {
-    final Stream<QuerySnapshot> playersStream =
-        players.where('selectionRank', isEqualTo: true).snapshots();
-    return playersStream;
   }
 
   // READ: get players name
@@ -119,7 +113,7 @@ class FirestoreService {
           Map<String, dynamic> playerData = doc.data() as Map<String, dynamic>;
 
           // Extract the required stats from the player's data
-          int currentScore = playerData['score'] ?? -100;
+          int currentScore = playerData['maxPoints'] ?? -100;
           int currentGamesPlayed = playerData['gamesPlayed'] ?? 0;
           int currentWinGames = playerData['winGames'] ?? 0;
 
