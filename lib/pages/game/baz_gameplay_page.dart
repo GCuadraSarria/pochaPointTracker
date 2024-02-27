@@ -147,10 +147,7 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                     child: ListView.builder(
                         itemCount: currentPlayersProvider.currentPlayers.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: PlayerBazContainer(playerIndex: index),
-                          );
+                          return PlayerBazContainer(playerIndex: index);
                         }),
                   ),
                   // back and next buttons
@@ -237,13 +234,14 @@ class PlayerBazContainer extends StatelessWidget {
       builder: (context, value, child) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Container(
-          height: 120.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: CustomColors.whiteColor, width: 1.5),
+          height: 110.0,
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: CustomColors.whiteColor, width: 1.5),
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               children: [
                 Row(
@@ -349,16 +347,7 @@ class _HorizontalNumberSelectorBazState
         // modify points based on the selection
         currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
       },
-      dynamicItemOpacity: 0.4,
-      dynamicItemSize: true,
-      dynamicSizeEquation: (value) {
-        // Make the immediate neighbors of the focused item smaller
-        if (value == 0) {
-          return 1;
-        } else {
-          return 0.8;
-        }
-      },
+      dynamicItemOpacity: 0.4,      
     );
   }
 }

@@ -38,17 +38,17 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
         child: Scaffold(
           body: Container(
             decoration: const BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                Color.fromARGB(255, 54, 18, 77),
-                CustomColors.backgroundColor
-              ],
-              stops: [
-                0.0,
-                0.9,
-              ],
+              gradient: RadialGradient(
+                colors: [
+                  Color.fromARGB(255, 54, 18, 77),
+                  CustomColors.backgroundColor
+                ],
+                stops: [
+                  0.0,
+                  0.9,
+                ],
+              ),
             ),
-          ),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 24.0),
               child: Column(
@@ -139,16 +139,13 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-            
+                  
                   // Containers of each player
                   Expanded(
                     child: ListView.builder(
                         itemCount: currentPlayersProvider.currentPlayers.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: PlayerVoteContainer(playerIndex: index),
-                          );
+                          return PlayerVoteContainer(playerIndex: index);
                         }),
                   ),
                   // next button
@@ -190,13 +187,14 @@ class PlayerVoteContainer extends StatelessWidget {
       builder: (context, value, child) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Container(
-          height: 120.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: CustomColors.whiteColor, width: 1.5),
+          height: 110.0,
+          decoration: const BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: CustomColors.whiteColor, width: 1.5),
+            ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: Column(
               children: [
                 Row(

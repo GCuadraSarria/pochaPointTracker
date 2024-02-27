@@ -58,6 +58,7 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextFormField(
+            style: const TextStyle(color: CustomColors.backgroundColor),
             controller: textController,
             maxLength: 12,
             onChanged: (value) {
@@ -69,7 +70,7 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
                 playerExists = false;
               });
             },
-            decoration: InputDecoration(
+            decoration: InputDecoration(              
               hintText: 'Nombre del jugador',
               hintStyle: const TextStyle(
                 fontSize: 18.0,
@@ -88,16 +89,20 @@ class NewPlayerAlertboxState extends State<NewPlayerAlertbox> {
               counterText: '',
             ),
           ),
-          playerExists
-              ? const Text(
-                  'Ya existe un jugador con ese nombre',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.w400,
-                    color: CustomColors.errorColor,
-                  ),
-                )
-              : const Text(''),
+          Row(
+            children: [
+              playerExists
+                  ? const Text(
+                      'Ya existe un jugador con ese nombre',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w400,
+                        color: CustomColors.errorColor,
+                      ),
+                    )
+                  : const Text(''),
+            ],
+          ),
         ],
       ),
       actions: [

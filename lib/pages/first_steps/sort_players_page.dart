@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/first_steps/dealer_players_page.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
@@ -90,14 +91,43 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                     ),
                   ),
                   const Spacer(),
-
+                  // alert information box
+                  Container(
+                    height: 60.0,
+                    width: 340.0,
+                    decoration: BoxDecoration(
+                      color: CustomColors.bgGradient1,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'lib/assets/icons/warning.svg',
+                          semanticsLabel: 'warning icon',
+                          colorFilter:
+                              const ColorFilter.mode(CustomColors.secondaryColor, BlendMode.srcIn),
+                        ),
+                        const SizedBox(width: 8.0),
+                        const Text(
+                          'Los jugadores deben organizarse en \nsentido contrario a las agujas del reloj.',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.w400,
+                            overflow: TextOverflow.clip
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
                   // back and next buttons
                   const GoBackButton(),
                   CustomButton(
                     text: 'Ir a ver quien reparte',
                     width: 340.0,
                     onPressed: () {
-                      //TODO: Randomize here
                       Navigator.push(
                         context,
                         MaterialPageRoute(
