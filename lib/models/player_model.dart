@@ -19,3 +19,13 @@ class PlayerInGame {
     this.winner = false,
   });
 }
+
+class PlayerInRank {
+  String playerName;
+  bool selected;
+
+  PlayerInRank({
+    required this.playerName,
+    this.selected = true,
+  });
+}

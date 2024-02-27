@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
-import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../models/player_model.dart';
+
 class PlayerRankingSelection extends StatefulWidget {
   final String playerName;
-  final bool selectionRank;
+  final bool selected;
+  final int index;
 
   const PlayerRankingSelection({
     super.key,
     required this.playerName,
-    required this.selectionRank,
+    required this.selected,
+    required this.index,
   });
 
   @override
@@ -19,9 +22,6 @@ class PlayerRankingSelection extends StatefulWidget {
 }
 
 class _PlayerRankingSelectionState extends State<PlayerRankingSelection> {
-  // firestore service
-  final FirestoreService firestoreService = FirestoreService();
-
   @override
   void initState() {
     super.initState();
@@ -40,11 +40,14 @@ class _PlayerRankingSelectionState extends State<PlayerRankingSelection> {
             alignment: Alignment.centerLeft,
             child: Checkbox(
               activeColor: CustomColors.secondaryColor,
-              value: widget.selectionRank,
+              value:
+                  currentPlayersProvider.allPlayersList[widget.index].selected,
               onChanged: (bool? value) {
                 setState(() {
-                  // update rank check bool
-                  firestoreService.playerSelection(widget.playerName, value!);
+                  currentPlayersProvider.allPlayersList[widget.index].selected =
+                      value!;
+                  // evaluate the button everytime we change a checkbox
+                  currentPlayersProvider.setNotPlayersSelected();
                 });
               },
             ),

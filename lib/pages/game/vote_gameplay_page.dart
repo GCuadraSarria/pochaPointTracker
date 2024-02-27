@@ -6,6 +6,7 @@ import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
+import 'package:wakelock/wakelock.dart';
 
 class VoteGameplayPage extends StatefulWidget {
   const VoteGameplayPage({super.key});
@@ -31,7 +32,11 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
+
+    // avoid blackscreen
+    Wakelock.enable();
 
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
@@ -139,7 +144,7 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
                     ),
                   ),
                   const SizedBox(height: 16.0),
-                  
+
                   // Containers of each player
                   Expanded(
                     child: ListView.builder(

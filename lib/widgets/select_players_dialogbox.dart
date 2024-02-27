@@ -4,6 +4,7 @@ import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
+import '../models/player_model.dart';
 import '../provider/provider.dart';
 import 'widgets.dart';
 
@@ -18,16 +19,28 @@ class _SelectPlayersDialogboxState extends State<SelectPlayersDialogbox> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
-  // all selected initially
-  bool allSelected = true;
+  // Define a variable to hold the initial state
+  List<PlayerInRank> initialList = [];
 
-  // get a list of the players
-  List<List<dynamic>> rankPlayers = [];
+  @override
+  void initState() {
+    // Fetch the initial state of allPlayersList
+    initialList = context.read<CurrentPlayers>().allPlayersList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     // provider service
     final currentPlayersProvider = context.read<CurrentPlayers>();
+
+    // Create a deep copy of the list
+    final List<PlayerInRank> localList = List<PlayerInRank>.from(
+      initialList.map((player) => PlayerInRank(
+            playerName: player.playerName,
+            selected: player.selected,
+          )),
+    );
 
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
@@ -48,21 +61,23 @@ class _SelectPlayersDialogboxState extends State<SelectPlayersDialogbox> {
             child: Dialog.fullscreen(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 24.0),
+                  horizontal: 20.0,
+                  vertical: 24.0,
+                ),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: const Text(
-                            'X',
-                            style: TextStyle(
-                              color: CustomColors.whiteColor,
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.w400,
-                            ),
+                        IconButton(
+                          onPressed: () {
+                            // if we close the modal we apply the last state to the list
+                            currentPlayersProvider.applyLocalList(localList);
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            color: CustomColors.whiteColor,
                           ),
                         ),
                       ],
@@ -87,12 +102,13 @@ class _SelectPlayersDialogboxState extends State<SelectPlayersDialogbox> {
                           onTap: () {
                             setState(() {
                               // update the users based on the selection
-                              allSelected = !allSelected;                              
-                              firestoreService.selectAll(allSelected);
+                              currentPlayersProvider.swapSelectAll();
+                              // check the state of the button to disalbe it
+                              currentPlayersProvider.setNotPlayersSelected();
                             });
                           },
                           child: Text(
-                            allSelected
+                            currentPlayersProvider.selectedAllSort
                                 ? 'Deseleccionar todo'
                                 : 'Seleccionar todo',
                             style: const TextStyle(
@@ -109,48 +125,26 @@ class _SelectPlayersDialogboxState extends State<SelectPlayersDialogbox> {
                     const SizedBox(height: 16.0),
                     // players list
                     Flexible(
-                      child: StreamBuilder<QuerySnapshot>(
-                        // get players sorted by name or points
-                        stream: firestoreService
-                            .showPlayersInfoSorted('playerName'),
-                        builder: (context, snapshot) {
-                          // if we have data, get all docs
-                          if (snapshot.hasData) {
-                            List playersList = snapshot.data!.docs;
-
-                            // display as a list
-                            return ListView.builder(
-                                itemCount: playersList.length,
-                                itemBuilder: (context, index) {
-                                  // get each individual doc
-                                  DocumentSnapshot document =
-                                      playersList[index];
-
-                                  // get player from each doc
-                                  Map<String, dynamic> data =
-                                      document.data() as Map<String, dynamic>;
-                                  String playerName = data['playerName'];
-                                  bool selectionRank = data['selectionRank'];
-
-                                  // display as a list tile
-                                  return PlayerRankingSelection(
-                                    playerName: playerName,
-                                    selectionRank: selectionRank,
-                                  );
-                                });
-                            // if there is no data return nothing
-                          } else {
-                            return const LoadingProgress();
-                          }
-                        },
-                      ),
+                      child: ListView.builder(
+                          itemCount:
+                              currentPlayersProvider.allPlayersList.length,
+                          itemBuilder: (context, index) {
+                            // display as a list tile
+                            return PlayerRankingSelection(
+                              playerName: currentPlayersProvider
+                                  .allPlayersList[index].playerName,
+                              selected: currentPlayersProvider
+                                  .allPlayersList[index].selected,
+                              index: index,
+                            );
+                          }),
                     ),
                     // compare button
                     CustomButton(
                       text: 'Comparar jugadores',
+                      isDisabled: currentPlayersProvider.notPlayersSelected,
                       width: 340.0,
                       onPressed: () {
-                        //TODO: Apply changes
                         Navigator.pop(context);
                       },
                     ),

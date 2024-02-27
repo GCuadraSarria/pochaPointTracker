@@ -5,6 +5,7 @@ import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import '../../models/player_model.dart';
 import '../../services/firestore.dart';
 
 class RankingPage extends StatefulWidget {
@@ -26,6 +27,8 @@ enum SortLabel {
   final String value;
 }
 
+List<PlayerInRank> allPlayersList = [];
+
 class _RankingPageState extends State<RankingPage> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
@@ -41,8 +44,8 @@ class _RankingPageState extends State<RankingPage> {
     // provider service
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
-    // local number of players
-    Future<int> filteredPlayers = firestoreService.getPlayerCount();
+    // we set the list with all players with checks
+    currentPlayersProvider.setAllPlayersList();
 
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
@@ -158,7 +161,8 @@ class _RankingPageState extends State<RankingPage> {
                         StreamBuilder<QuerySnapshot>(
                           // get players and their stats
                           stream: firestoreService.getPlayersSorted(
-                              currentPlayersProvider.sortingRank),
+                              currentPlayersProvider.sortingRank,
+                              currentPlayersProvider.allPlayersList),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -185,12 +189,15 @@ class _RankingPageState extends State<RankingPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            // select player dialog
-                            showDialog<String>(
+                            showModalBottomSheet(
+                              isScrollControlled: true,
                               context: context,
                               builder: (BuildContext context) =>
                                   const SelectPlayersDialogbox(),
-                            );
+                            ).then((_) {
+                              // Trigger a rebuild of the ranking_page here
+                              setState(() {});
+                            });
                           },
                           child: const Text(
                             'Seleccionar',
@@ -211,8 +218,9 @@ class _RankingPageState extends State<RankingPage> {
                   Flexible(
                     child: StreamBuilder<QuerySnapshot>(
                       // get players and their stats
-                      stream: firestoreService
-                          .getPlayersSorted(currentPlayersProvider.sortingRank),
+                      stream: firestoreService.getPlayersSorted(
+                          currentPlayersProvider.sortingRank,
+                          currentPlayersProvider.allPlayersList),
                       builder: (context, snapshot) {
                         // if we are waiting for data, show loading progress
                         if (snapshot.connectionState ==
@@ -222,9 +230,6 @@ class _RankingPageState extends State<RankingPage> {
                         // if we have data, get all docs
                         if (snapshot.hasData) {
                           List playersList = snapshot.data!.docs;
-                          // set number of players in the list
-                          currentPlayersProvider
-                              .filteredPlayers(playersList.length);
 
                           // display as a list
                           return ListView.builder(

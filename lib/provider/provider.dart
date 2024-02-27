@@ -57,8 +57,14 @@ class CurrentPlayers extends ChangeNotifier {
   bool _dealerFlag = false;
   bool get dealerFlag => _dealerFlag;
 
-  int _totalPlayersFilter = 0;
-  int get totalPlayersFilter => _totalPlayersFilter;
+  bool _selectedAllSort = true;
+  bool get selectedAllSort => _selectedAllSort;
+
+  List<PlayerInRank> _allPlayersList = [];
+  List<PlayerInRank> get allPlayersList => _allPlayersList;
+
+  bool _notPlayersSelected = false;
+  bool get notPlayersSelected => _notPlayersSelected;
 
   // add a player to the new game
   Future<void> addPlayers() async {
@@ -80,6 +86,49 @@ class CurrentPlayers extends ChangeNotifier {
     }
   }
 
+  // add all players to selected list
+  Future<void> setAllPlayersList() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance.collection('players').get();
+      // we loop in the document and add everyname filtered to _allPlayersList
+      for (var doc in querySnapshot.docs) {
+        if (!_allPlayersList
+            .any((player) => player.playerName == doc['playerName'])) {
+          // if the player is not in the current list we add it
+          _allPlayersList.add(PlayerInRank(playerName: doc['playerName']));
+        }
+        notifyListeners();
+      }
+    } catch (error) {
+      // ignore: avoid_print
+      print('Error getting players playing: $error');
+    }
+  }
+
+  // apply stored list to allPlayers to discard changes
+  void applyLocalList(List<PlayerInRank> value) {
+    _allPlayersList = value;
+    notifyListeners();
+  }
+
+  // we swap the select / unselect all
+  void swapSelectAll() {
+    _selectedAllSort = !_selectedAllSort;
+    for (var player in _allPlayersList) {
+      player.selected = _selectedAllSort;
+    }
+
+    notifyListeners();
+  }
+
+  // update rank button
+  void setNotPlayersSelected() {
+    // if every player selected a checkbox we sent true
+    _notPlayersSelected = _allPlayersList.every((player) => !player.selected);
+    notifyListeners();
+  }
+
   // sort players based on the drag and drop
   void sortCurrentPlayer(int oldIndex, int newIndex) {
     // adjust if the tile goes to the bottom
@@ -97,12 +146,6 @@ class CurrentPlayers extends ChangeNotifier {
     // Update the _currentPlayers list
     _currentPlayers = updatedPlayers;
 
-    notifyListeners();
-  }
-
-  // get number of players filtered
-  void filteredPlayers(int amountFiltered) {
-    _totalPlayersFilter = amountFiltered;
     notifyListeners();
   }
 

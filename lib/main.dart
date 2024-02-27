@@ -9,8 +9,10 @@ import 'services/starting_value.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // initialize firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // Set default value for all users
+
+  // set default value for all users
   await setDefaultValueForAllPlayers();
   runApp(
     ChangeNotifierProvider(

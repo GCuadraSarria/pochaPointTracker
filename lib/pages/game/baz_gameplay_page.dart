@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
 import 'package:pocha_points_tracker/pages/game/winner_gameplay_page.dart';
 import 'package:provider/provider.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
@@ -34,6 +35,9 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
   Widget build(BuildContext context) {
     // provider service
     final currentPlayersProvider = context.read<CurrentPlayers>();
+
+    // avoid blackscreen
+    Wakelock.enable();
 
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
@@ -201,7 +205,10 @@ class PlayerBazContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
+
+
 
     //widget that controlls the text displayed based on the local points
     Widget obtainedPointsText() {
