@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
+import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 
 class ConfigurationPage extends StatefulWidget {

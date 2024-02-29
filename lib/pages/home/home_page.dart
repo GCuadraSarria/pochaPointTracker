@@ -65,7 +65,7 @@ class HomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20.0),
                   CustomButton(
-                    text: 'Ranking',
+                    text: 'Estadísticas',
                     width: 294.0,
                     isFilled: false,
                     onPressed: () async {

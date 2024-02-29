@@ -25,7 +25,6 @@ class FirestoreService {
         'winGames': 0,
         'gamesWinRate': 0,
         'doIplay': false,
-        'maxPoints': -100,
       });
       // ignore: avoid_print
       print('Player added to Firestore successfully.');
@@ -61,9 +60,9 @@ class FirestoreService {
 
     // Construct a query for players whose names are in selectedPlayerNames
     Query query = players.where('playerName', whereIn: selectedPlayerNames);
-
+    
     // Order the query based on the sortValue
-    if (sortValue == 'playerName') {
+    if (sortValue == 'playerName' || sortValue == 'minPoints') {
       query = query.orderBy(sortValue, descending: false);
     } else {
       query = query.orderBy(sortValue, descending: true);
@@ -115,9 +114,10 @@ class FirestoreService {
           Map<String, dynamic> playerData = doc.data() as Map<String, dynamic>;
 
           // Extract the required stats from the player's data
-          int currentScore = playerData['maxPoints'] ?? -100;
+          int currentMaxPoints = playerData['maxPoints'] ?? -100;
           int currentGamesPlayed = playerData['gamesPlayed'] ?? 0;
           int currentWinGames = playerData['winGames'] ?? 0;
+          int currentMinPoints = playerData['minPoints'] ?? 100;
 
           // Calculate win rate ( add +1 to currentWin if player.winner == true)
           int gamesWinRate = winner
@@ -127,7 +127,8 @@ class FirestoreService {
           // Update the player's stats based on the provided data
           await doc.reference.update({
             'gamesPlayed': FieldValue.increment(1),
-            'maxPoints': max(currentScore, score),
+            'maxPoints': max(currentMaxPoints, score),
+            'minPoints': min(currentMinPoints, score),
             'winGames': winner ? FieldValue.increment(1) : currentWinGames,
             'gamesWinRate': gamesWinRate,
             'doIplay': false,

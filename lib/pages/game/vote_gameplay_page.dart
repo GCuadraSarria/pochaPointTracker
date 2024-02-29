@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/game/baz_gameplay_page.dart';
+import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';

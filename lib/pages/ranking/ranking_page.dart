@@ -127,7 +127,8 @@ class _RankingPageState extends State<RankingPage> {
                           onChanged: (SortLabelDropdown? sort) {
                             selectedSort = sort;
                             currentPlayersProvider.setSortingRank(sort!.value);
-                            currentPlayersProvider.setDropdownValues(sort.value);
+                            currentPlayersProvider
+                                .setDropdownValues(sort.value);
                           },
                         ),
                       ),
@@ -217,6 +218,11 @@ class _RankingPageState extends State<RankingPage> {
                           return ListView.builder(
                               itemCount: playersList.length,
                               itemBuilder: (context, index) {
+                                /* in case we have problems with DB
+                                  if we change the sorting system we need to create
+                                  indexes in FB
+                                  print(snapshot.error);
+                                 */
                                 // get each individual doc
                                 DocumentSnapshot document = playersList[index];
 

@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:random_text_reveal/random_text_reveal.dart';
-import 'package:pocha_points_tracker/pages/game/vote_gameplay_page.dart';
+import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:random_text_reveal/random_text_reveal.dart';
 
 class DealerPlayersPage extends StatefulWidget {
   const DealerPlayersPage({super.key});

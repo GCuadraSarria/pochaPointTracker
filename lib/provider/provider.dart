@@ -86,6 +86,10 @@ class CurrentPlayers extends ChangeNotifier {
       label: 'Puntuación máxima',
       value: 'maxPoints',
     ),
+    SortLabelDropdown(
+      label: 'Puntuación mínima',
+      value: 'minPoints',
+    ),
   ];
   List<SortLabelDropdown> get dropdownValues => _dropdownValues;
 
@@ -170,6 +174,10 @@ class CurrentPlayers extends ChangeNotifier {
       SortLabelDropdown(
         label: 'Puntuación máxima',
         value: 'maxPoints',
+      ),
+      SortLabelDropdown(
+        label: 'Puntuación mínima',
+        value: 'minPoints',
       ),
     ];
     _dropdownValues.removeWhere((dropdown) => dropdown.value == value);
