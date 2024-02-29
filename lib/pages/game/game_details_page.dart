@@ -27,7 +27,7 @@ class GameDetailsPage extends StatelessWidget {
             child: Container(
               height: 60.0,
               alignment: Alignment.center,
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               decoration: player.winner == false
                   ? BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
@@ -110,27 +110,15 @@ class GameDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Clasificación de la partida',
-                          style: TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.more_vert,
-                            size: 32.0,
-                          ),
-                        ),
-                      ],
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Text(
+                      'Clasificación de la partida',
+                      style: TextStyle(
+                        color: CustomColors.whiteColor,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 56.0),
@@ -144,7 +132,6 @@ class GameDetailsPage extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Spacer(),
 
                   // restart and menu buttons
                   TextButton(

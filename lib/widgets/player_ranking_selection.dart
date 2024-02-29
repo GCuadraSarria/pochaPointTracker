@@ -3,8 +3,6 @@ import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
-import '../models/player_model.dart';
-
 class PlayerRankingSelection extends StatefulWidget {
   final String playerName;
   final bool selected;

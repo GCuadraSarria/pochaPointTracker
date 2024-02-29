@@ -1,8 +1,6 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../models/player_model.dart';
+import 'package:pocha_points_tracker/models/models.dart';
 
 class FirestoreService {
   // get collection of players

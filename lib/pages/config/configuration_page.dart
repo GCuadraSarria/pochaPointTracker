@@ -118,6 +118,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                       ),
                     ],
                   ),
+                  // india radio buttons
                   RadioButtons(
                     initialPlayWithIndiaState: initialPlayWithIndiaState,
                     onChanged: (bool value) {
@@ -127,7 +128,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                     },
                   ),
                   const Spacer(),
-            
+
                   // back and next buttons
                   const GoBackButton(btnText: 'Cancelar'),
                   CustomButton(
@@ -175,45 +176,27 @@ class _HorizontalNumberSelectorConfigState
     extends State<HorizontalNumberSelectorConfig> {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: AlignmentDirectional.center,
-      children: [
-        Container(
-          height: 50,
-          width: 250,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color.fromRGBO(29, 29, 29, 1.0), // 100% opacity
-                  Color.fromRGBO(29, 29, 29, 0.0), // 0% opacity
-                  Color.fromRGBO(29, 29, 29, 1.0), // 100% opacity
-                ]),
-          ),
-        ),
-        ScrollSnapList(
-          initialIndex: widget.initialRoundState.toDouble() - 1,
-          itemBuilder: _buildItemList,
-          itemCount: roundList.length,
-          itemSize: 50.0,
-          margin: const EdgeInsets.symmetric(horizontal: 0.5),
-          dynamicItemSize: true,
-          onItemFocus: (index) {
-            // modify rounds based on the selection
-            widget.onChanged(roundList[index]);
-          },
-          dynamicItemOpacity: 0.4,
-          curve: Curves.ease,
-        ),
-      ],
+    return ScrollSnapList(
+      initialIndex: widget.initialRoundState.toDouble() - 1,
+      itemBuilder: _buildItemList,
+      itemCount: roundList.length,
+      itemSize: 60.0,
+      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      dynamicItemSize: true,
+      onItemFocus: (index) {
+        // modify rounds based on the selection
+        widget.onChanged(roundList[index]);
+      },
+      dynamicItemOpacity: 0.4,
+      curve: Curves.ease,
     );
   }
 }
 
 Widget _buildItemList(BuildContext context, int index) {
   return SizedBox(
-    width: 50.0,
+    width: 60.0,
     child: Center(
       child: Text(
         '${roundList[index]}',

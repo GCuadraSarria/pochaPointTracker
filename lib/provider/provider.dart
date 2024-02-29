@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/models/player_model.dart';
+import 'package:pocha_points_tracker/models/models.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 
 // firestore service
@@ -66,6 +66,29 @@ class CurrentPlayers extends ChangeNotifier {
   bool _notPlayersSelected = false;
   bool get notPlayersSelected => _notPlayersSelected;
 
+  bool _openRankDropdown = false;
+  bool get openRankDropdown => _openRankDropdown;
+
+  List<SortLabelDropdown> _dropdownValues = [
+    SortLabelDropdown(
+      label: 'Partidas jugadas',
+      value: 'gamesPlayed',
+    ),
+    SortLabelDropdown(
+      label: 'Partidas ganadas',
+      value: 'winGames',
+    ),
+    SortLabelDropdown(
+      label: 'Porcentaje de victorias',
+      value: 'gamesWinRate',
+    ),
+    SortLabelDropdown(
+      label: 'Puntuación máxima',
+      value: 'maxPoints',
+    ),
+  ];
+  List<SortLabelDropdown> get dropdownValues => _dropdownValues;
+
   // add a player to the new game
   Future<void> addPlayers() async {
     // we filter all players where doIplay is set to true
@@ -119,6 +142,37 @@ class CurrentPlayers extends ChangeNotifier {
       player.selected = _selectedAllSort;
     }
 
+    notifyListeners();
+  }
+
+  // set open rank dropdown
+  void setOpenRankDropdown(bool value) {
+    _openRankDropdown = value;
+    notifyListeners();
+  }
+
+  // set dropdown values
+  void setDropdownValues(String value) {
+    // we set all the values and then remove the selected one
+    _dropdownValues = [
+      SortLabelDropdown(
+        label: 'Partidas jugadas',
+        value: 'gamesPlayed',
+      ),
+      SortLabelDropdown(
+        label: 'Partidas ganadas',
+        value: 'winGames',
+      ),
+      SortLabelDropdown(
+        label: 'Porcentaje de victorias',
+        value: 'gamesWinRate',
+      ),
+      SortLabelDropdown(
+        label: 'Puntuación máxima',
+        value: 'maxPoints',
+      ),
+    ];
+    _dropdownValues.removeWhere((dropdown) => dropdown.value == value);
     notifyListeners();
   }
 
@@ -176,7 +230,7 @@ class CurrentPlayers extends ChangeNotifier {
     notifyListeners();
   }
 
-  // enable button
+  // enable button in sorting players page
   void enableButtonToSortPlayers(String playerName, bool? check) {
     // loop thru the list to check the existences
     bool playerExists = false;
@@ -205,7 +259,7 @@ class CurrentPlayers extends ChangeNotifier {
     notifyListeners();
   }
 
-  // enable button after dealer
+  // enable button after dealer is set
   void gotDealer() {
     _dealerFlag = true;
     notifyListeners();
@@ -427,6 +481,7 @@ class CurrentPlayers extends ChangeNotifier {
     _numberOfCards = 1;
     _lastRound = false;
     _dealerFlag = false;
+    _openRankDropdown = false;
     notifyListeners();
   }
 }

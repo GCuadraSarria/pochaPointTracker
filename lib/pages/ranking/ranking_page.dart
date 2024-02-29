@@ -5,7 +5,7 @@ import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import '../../models/player_model.dart';
+import '../../models/models.dart';
 import '../../services/firestore.dart';
 
 class RankingPage extends StatefulWidget {
@@ -13,18 +13,6 @@ class RankingPage extends StatefulWidget {
 
   @override
   State<RankingPage> createState() => _RankingPageState();
-}
-
-// dropdownMenuEntry labels and values for the dropdown menu.
-enum SortLabel {
-  gamesPlayed('Partidas jugadas', 'gamesPlayed'),
-  winGames('Partidas ganadas', 'winGames'),
-  gamesWinRate('Porcentaje de victorias', 'gamesWinRate'),
-  maxPoints('Puntuación máxima', 'maxPoints');
-
-  const SortLabel(this.label, this.value);
-  final String label;
-  final String value;
 }
 
 List<PlayerInRank> allPlayersList = [];
@@ -37,7 +25,7 @@ class _RankingPageState extends State<RankingPage> {
   final TextEditingController sortController = TextEditingController();
 
   // selected sorting dropdown
-  SortLabel? selectedSort;
+  SortLabelDropdown? selectedSort;
 
   @override
   Widget build(BuildContext context) {
@@ -103,50 +91,44 @@ class _RankingPageState extends State<RankingPage> {
                   ),
                   const SizedBox(height: 16.0),
                   // select sorting value dropdown
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: Container(
-                        height: 60.0,
-                        color: CustomColors.whiteColor,
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            padding: const EdgeInsets.all(12.0),
-                            hint: Text(
-                              SortLabel.gamesPlayed.label,
-                              style: const TextStyle(
-                                color: CustomColors.backgroundColor,
-                                fontSize: 22.0,
-                                fontWeight: FontWeight.w400,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          // if we open the dropdown we clear the bottom round corners
+                          borderRadius: currentPlayersProvider.openRankDropdown
+                              ? const BorderRadius.vertical(
+                                  top: Radius.circular(8.0),
+                                )
+                              : BorderRadius.circular(8.0),
+                        ),
+                        child: CustDropDown(
+                          items: currentPlayersProvider.dropdownValues
+                              .map<CustDropdownMenuItem<SortLabelDropdown>>(
+                                  (SortLabelDropdown sort) {
+                            return CustDropdownMenuItem<SortLabelDropdown>(
+                              value: sort,
+                              child: Text(
+                                sort.label,
+                                style: const TextStyle(
+                                  backgroundColor: CustomColors.whiteColor,
+                                  color: CustomColors.bgGradient1,
+                                  fontSize: 22.0,
+                                ),
                               ),
-                            ),
-                            isExpanded: true,
-                            icon: const Icon(
-                              Icons.expand_more,
-                              color: CustomColors.backgroundColor,
-                            ),
-                            style: const TextStyle(
-                                backgroundColor: CustomColors.whiteColor,
-                                color: CustomColors.backgroundColor,
-                                fontSize: 22.0),
-                            dropdownColor: CustomColors.whiteColor,
-                            borderRadius: BorderRadius.circular(8.0),
-                            value: selectedSort,
-                            onChanged: (SortLabel? sort) {
-                              selectedSort = sort;
-                              currentPlayersProvider
-                                  .setSortingRank(sort!.value);
-                            },
-                            items: SortLabel.values
-                                .map<DropdownMenuItem<SortLabel>>(
-                                    (SortLabel sort) {
-                              return DropdownMenuItem<SortLabel>(
-                                value: sort,
-                                child: Text(sort.label),
-                              );
-                            }).toList(),
-                          ),
+                            );
+                          }).toList(),
+                          maxListHeight: 600.0,
+                          defaultSelectedIndex: 0,
+                          borderRadius: 8.0,
+                          onChanged: (SortLabelDropdown? sort) {
+                            selectedSort = sort;
+                            currentPlayersProvider.setSortingRank(sort!.value);
+                            currentPlayersProvider.setDropdownValues(sort.value);
+                          },
                         ),
                       ),
                     ),

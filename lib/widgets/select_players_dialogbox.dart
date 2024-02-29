@@ -1,10 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:pocha_points_tracker/models/models.dart';
 import 'package:pocha_points_tracker/services/firestore.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
 
-import '../models/player_model.dart';
 import '../provider/provider.dart';
 import 'widgets.dart';
 

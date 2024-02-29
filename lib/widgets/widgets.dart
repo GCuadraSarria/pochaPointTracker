@@ -1,4 +1,5 @@
 export 'custom_button.dart';
+export 'custom_rank_dropdown.dart';
 export 'go_back_button.dart';
 export 'loading_progress.dart';
 export 'new_player_alertbox.dart';
