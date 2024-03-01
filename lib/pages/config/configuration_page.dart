@@ -40,17 +40,17 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
         child: Scaffold(
           body: Container(
             decoration: const BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                Color.fromARGB(255, 54, 18, 77),
-                CustomColors.backgroundColor
-              ],
-              stops: [
-                0.0,
-                0.9,
-              ],
+              gradient: RadialGradient(
+                colors: [
+                  Color.fromARGB(255, 54, 18, 77),
+                  CustomColors.backgroundColor
+                ],
+                stops: [
+                  0.0,
+                  0.9,
+                ],
+              ),
             ),
-          ),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 12.0, vertical: 24.0),
@@ -92,7 +92,7 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                   // round selector
                   SizedBox(
                     height: 75.0,
-                    width: 250.0,
+                    width: 200.0,
                     child: HorizontalNumberSelectorConfig(
                         initialRoundState: initialRoundState,
                         onChanged: (int value) {
@@ -140,7 +140,8 @@ class _ConfigurationPageState extends State<ConfigurationPage> {
                       currentPlayersProvider.setMaxCards(localRoundState);
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomePage()),
+                        MaterialPageRoute(
+                            builder: (context) => const HomePage()),
                       );
                     },
                   ),
@@ -176,20 +177,33 @@ class _HorizontalNumberSelectorConfigState
     extends State<HorizontalNumberSelectorConfig> {
   @override
   Widget build(BuildContext context) {
-    return ScrollSnapList(
-      initialIndex: widget.initialRoundState.toDouble() - 1,
-      itemBuilder: _buildItemList,
-      itemCount: roundList.length,
-      itemSize: 60.0,
-      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      dynamicItemSize: true,
-      onItemFocus: (index) {
-        // modify rounds based on the selection
-        widget.onChanged(roundList[index]);
-      },
-      dynamicItemOpacity: 0.4,
-      curve: Curves.ease,
+    return ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [
+            Color.fromRGBO(255, 255, 255, 0.0),
+            Color.fromRGBO(255, 255, 255, 0.2),
+            Color.fromRGBO(255, 255, 255, 1.0),
+            Color.fromRGBO(255, 255, 255, 0.2),
+            Color.fromRGBO(255, 255, 255, 0.0),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ).createShader(bounds),
+      child: ScrollSnapList(
+        initialIndex: widget.initialRoundState.toDouble() - 1,
+        itemBuilder: _buildItemList,
+        itemCount: roundList.length,
+        itemSize: 60.0,
+        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+        padding: const EdgeInsets.symmetric(horizontal: 5.0),
+        dynamicItemSize: true,
+        onItemFocus: (index) {
+          // modify rounds based on the selection
+          widget.onChanged(roundList[index]);
+        },
+        dynamicItemOpacity: 0.4,
+        curve: Curves.ease,
+      ),
     );
   }
 }
@@ -199,14 +213,15 @@ Widget _buildItemList(BuildContext context, int index) {
     width: 60.0,
     child: Center(
       child: Text(
-        '${roundList[index]}',
-        style: const TextStyle(
-          color: CustomColors.whiteColor,
-          fontSize: 50.0,
-          fontWeight: FontWeight.bold,
+          '${roundList[index]}',
+          style: const TextStyle(
+            color: CustomColors.whiteColor,
+            fontSize: 50.0,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-    ),
+    
   );
 }
 

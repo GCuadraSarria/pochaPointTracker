@@ -334,26 +334,39 @@ class _HorizontalNumberSelectorBazState
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
-    return ScrollSnapList(
-      itemBuilder: _buildItemList,
-      itemCount: currentPlayersProvider.scrollableNumberList.length,
-      itemSize: 40.0,
-      onItemFocus: (index) {
-        // find the matching player and modify baz according
-        // to the selected numberList
-        currentPlayersProvider.currentPlayers
-            .firstWhere(
-              (player) => player.playerName == widget.currentPlayer,
-            )
-            .baz = currentPlayersProvider.scrollableNumberList[index];
-    
-        // check if everybody baz
-        currentPlayersProvider.checkIfAllPlayersBaz();
-    
-        // modify points based on the selection
-        currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
-      },
-      dynamicItemOpacity: 0.4,      
+    return ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          colors: [
+            Color.fromRGBO(255, 255, 255, 0.0),
+            Color.fromRGBO(255, 255, 255, 0.2),
+            Color.fromRGBO(255, 255, 255, 1.0),
+            Color.fromRGBO(255, 255, 255, 0.2),
+            Color.fromRGBO(255, 255, 255, 0.0),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ).createShader(bounds),
+      child: ScrollSnapList(
+        itemBuilder: _buildItemList,
+        itemCount: currentPlayersProvider.scrollableNumberList.length,
+        itemSize: 40.0,
+        onItemFocus: (index) {
+          // find the matching player and modify baz according
+          // to the selected numberList
+          currentPlayersProvider.currentPlayers
+              .firstWhere(
+                (player) => player.playerName == widget.currentPlayer,
+              )
+              .baz = currentPlayersProvider.scrollableNumberList[index];
+      
+          // check if everybody baz
+          currentPlayersProvider.checkIfAllPlayersBaz();
+      
+          // modify points based on the selection
+          currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
+        },
+        dynamicItemOpacity: 0.4,      
+      ),
     );
   }
 }

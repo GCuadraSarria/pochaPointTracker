@@ -90,7 +90,6 @@ class _SortPlayersPageState extends State<SortPlayersPage> {
                       ],
                     ),
                   ),
-                  const Spacer(),
                   // alert information box
                   Container(
                     height: 60.0,

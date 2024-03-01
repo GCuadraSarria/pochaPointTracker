@@ -264,28 +264,41 @@ class _HorizontalNumberSelectorVoteState
   Widget build(BuildContext context) {
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
-    return ScrollSnapList(
-      itemBuilder: _buildItemList,
-      itemCount: currentPlayersProvider.scrollableNumberList.length,
-      itemSize: 40.0,
-      margin: const EdgeInsets.symmetric(horizontal: 0.5),
-      dynamicItemSize: true,
-      onItemFocus: (index) {
-        // find the matching player and modify vote according
-        // to the selected numberList
-        currentPlayersProvider.currentPlayers
-            .firstWhere(
-              (player) => player.playerName == widget.currentPlayer,
-            )
-            .vote = currentPlayersProvider.scrollableNumberList[index];
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color.fromRGBO(255, 255, 255, 0.0),
+          Color.fromRGBO(255, 255, 255, 0.2),
+          Color.fromRGBO(255, 255, 255, 1.0),
+          Color.fromRGBO(255, 255, 255, 0.2),
+          Color.fromRGBO(255, 255, 255, 0.0),
+        ],
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+      ).createShader(bounds),
+      child: ScrollSnapList(
+        itemBuilder: _buildItemList,
+        itemCount: currentPlayersProvider.scrollableNumberList.length,
+        itemSize: 40.0,
+        margin: const EdgeInsets.symmetric(horizontal: 0.5),
+        dynamicItemSize: true,
+        onItemFocus: (index) {
+          // find the matching player and modify vote according
+          // to the selected numberList
+          currentPlayersProvider.currentPlayers
+              .firstWhere(
+                (player) => player.playerName == widget.currentPlayer,
+              )
+              .vote = currentPlayersProvider.scrollableNumberList[index];
 
-        // check if everybody voted
-        currentPlayersProvider.checkIfAllPlayersVoted();
+          // check if everybody voted
+          currentPlayersProvider.checkIfAllPlayersVoted();
 
-        // modify points based on the selection
-        currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
-      },
-      dynamicItemOpacity: 0.4,
+          // modify points based on the selection
+          currentPlayersProvider.checkPlayerPoints(widget.currentPlayer);
+        },
+        dynamicItemOpacity: 0.4,
+      ),
     );
   }
 }
