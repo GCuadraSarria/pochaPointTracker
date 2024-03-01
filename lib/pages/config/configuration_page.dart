@@ -178,17 +178,8 @@ class _HorizontalNumberSelectorConfigState
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
-        shaderCallback: (bounds) => const LinearGradient(
-          colors: [
-            Color.fromRGBO(255, 255, 255, 0.0),
-            Color.fromRGBO(255, 255, 255, 0.2),
-            Color.fromRGBO(255, 255, 255, 1.0),
-            Color.fromRGBO(255, 255, 255, 0.2),
-            Color.fromRGBO(255, 255, 255, 0.0),
-          ],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ).createShader(bounds),
+      shaderCallback: (bounds) =>
+          CustomColors.shadowGradient.createShader(bounds),
       child: ScrollSnapList(
         initialIndex: widget.initialRoundState.toDouble() - 1,
         itemBuilder: _buildItemList,
@@ -213,15 +204,14 @@ Widget _buildItemList(BuildContext context, int index) {
     width: 60.0,
     child: Center(
       child: Text(
-          '${roundList[index]}',
-          style: const TextStyle(
-            color: CustomColors.whiteColor,
-            fontSize: 50.0,
-            fontWeight: FontWeight.bold,
-          ),
+        '${roundList[index]}',
+        style: const TextStyle(
+          color: CustomColors.whiteColor,
+          fontSize: 50.0,
+          fontWeight: FontWeight.bold,
         ),
       ),
-    
+    ),
   );
 }
 

@@ -265,17 +265,8 @@ class _HorizontalNumberSelectorVoteState
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
     return ShaderMask(
-      shaderCallback: (bounds) => const LinearGradient(
-        colors: [
-          Color.fromRGBO(255, 255, 255, 0.0),
-          Color.fromRGBO(255, 255, 255, 0.2),
-          Color.fromRGBO(255, 255, 255, 1.0),
-          Color.fromRGBO(255, 255, 255, 0.2),
-          Color.fromRGBO(255, 255, 255, 0.0),
-        ],
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-      ).createShader(bounds),
+      shaderCallback: (bounds) =>
+          CustomColors.shadowGradient.createShader(bounds),
       child: ScrollSnapList(
         itemBuilder: _buildItemList,
         itemCount: currentPlayersProvider.scrollableNumberList.length,

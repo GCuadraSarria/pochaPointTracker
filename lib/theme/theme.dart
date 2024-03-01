@@ -13,4 +13,16 @@ class CustomColors {
   static const Color bgGradient2 = Color(0xFF939393);
   static const Color bgGradient3 = Color(0xFFBFBFBF);
   static const Color bgGradient4 = Color(0xFFE0E0E0);
+  // linear gradients
+  static const LinearGradient shadowGradient = LinearGradient(
+    colors: [
+      Color.fromRGBO(255, 255, 255, 0.00),
+      Color.fromRGBO(255, 255, 255, 0.35),
+      Color.fromRGBO(255, 255, 255, 1.00),
+      Color.fromRGBO(255, 255, 255, 0.35),
+      Color.fromRGBO(255, 255, 255, 0.00),
+    ],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
 }
