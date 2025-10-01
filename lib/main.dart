@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pocha_points_tracker/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/create_achievements/create_achievements_page.dart';
-import 'package:pocha_points_tracker/pages/create_achievements/test.dart';
+import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:provider/provider.dart';
 
@@ -46,12 +46,7 @@ class MyApp extends StatelessWidget {
           displayLarge: TextStyle(fontFamily: 'Roboto'),
         ),
       ),
-
-      // home: const HomePage(),
-      home: const TestPage(
-        name: 'Peke',
-        achievement: 'El geylord',
-      ),
+      home: const HomePage(),
     );
   }
 }

@@ -73,6 +73,18 @@ class CurrentPlayers extends ChangeNotifier {
   bool _openRankDropdown = false;
   bool get openRankDropdown => _openRankDropdown;
 
+  bool _showAchievement = false;
+  bool get showAchievement => _showAchievement;
+
+  String _achievementPlayer = "";
+  String get achievementPlayer => _achievementPlayer;
+
+  String _achievementName = "";
+  String get achievementName => _achievementName;
+
+  String _achievementDescription = "";
+  String get achievementDescription => _achievementDescription;
+
   List<SortLabelDropdown> _dropdownValues = [
     SortLabelDropdown(
       label: 'Partidas jugadas',
@@ -481,6 +493,9 @@ class CurrentPlayers extends ChangeNotifier {
       _currentPlayers[i].totalScore.add(_currentPlayers[i].score);
       _currentPlayers[i].bazList.add(_currentPlayers[i].baz);
       _currentPlayers[i].voteList.add(_currentPlayers[i].vote);
+      _currentPlayers[i].baz == _currentPlayers[i].vote
+          ? _currentPlayers[i].streak++
+          : _currentPlayers[i].streak = 0;
       _currentPlayers[i].vote = '-';
       _currentPlayers[i].baz = '-';
     }
@@ -490,6 +505,7 @@ class CurrentPlayers extends ChangeNotifier {
     //index 0 gets the last index because he becomes the dealer
     sortByMatch(_currentPlayers.first.playerName);
     updateDealer();
+    if (_currentPlayers.length >= 3) checkAchievements();
     notifyListeners();
   }
 
@@ -551,6 +567,7 @@ class CurrentPlayers extends ChangeNotifier {
       _currentPlayers[i].bazList.add(_currentPlayers[i].baz);
       _currentPlayers[i].voteList.add(_currentPlayers[i].vote);
     }
+
     // sort the players by score
     sortByScore();
 
@@ -570,6 +587,9 @@ class CurrentPlayers extends ChangeNotifier {
       status: 'finished',
       players: _currentPlayers.map((p) => p.playerName).toList(),
     );
+
+    // check achievements
+    if (_currentPlayers.length >= 3) checkAchievementsPoints();
 
     // we have to update the score of the players
     // we have to clean the players localpoints, vote and baz to 0
@@ -613,6 +633,72 @@ class CurrentPlayers extends ChangeNotifier {
     _lastRound = false;
     _dealerFlag = false;
     _openRankDropdown = false;
+    notifyListeners();
+  }
+
+  void checkAchievements() {
+    checkAchievementsRounds();
+    checkAchievementsSevenBaz();
+    notifyListeners();
+  }
+
+  void checkAchievementsRounds() async {
+    for (int i = 0; i < _currentPlayers.length; i++) {
+      if (_currentPlayers[i].streak == 10) {
+        final nuevo = await firestoreService.achievement(
+            achievementId: 'racha_10',
+            playerName: _currentPlayers[i].playerName);
+        if (nuevo) {
+          _showAchievement = true;
+          _achievementPlayer = _currentPlayers[i].playerName;
+          _achievementName = "Richi 10 rachas";
+          _achievementDescription = "Racha de 10 bazas";
+        }
+        notifyListeners();
+      }
+    }
+  }
+
+  void checkAchievementsSevenBaz() async {
+    for (int i = 0; i < _currentPlayers.length; i++) {
+      if (_currentPlayers[i].bazList.last == '1' &&
+          _currentPlayers[i].voteList.last == '1') {
+        final nuevo = await firestoreService.achievement(
+            achievementId: 'bazas_7',
+            playerName: _currentPlayers[i].playerName);
+        if (nuevo) {
+          _achievementPlayer = _currentPlayers[i].playerName;
+          _achievementName = "All-in al 7";
+          _achievementDescription = "45 puntos en una ronda";
+          _showAchievement = true;
+        }
+        notifyListeners();
+      }
+    }
+  }
+
+  void checkAchievementsPoints() async {
+    for (int i = 0; i < _currentPlayers.length; i++) {
+      if (_currentPlayers[i].score >= 200) {
+        final nuevo = await firestoreService.achievement(
+            achievementId: 'score_200',
+            playerName: _currentPlayers[i].playerName);
+        if (nuevo) {
+          _achievementPlayer = _currentPlayers[i].playerName;
+          _achievementName = "Mister 200%";
+          _achievementDescription = "200 puntos en una partida";
+          _showAchievement = true;
+        }
+        notifyListeners();
+      }
+    }
+  }
+
+  void resetAchievementOverlay() {
+    _showAchievement = false;
+    _achievementPlayer = "";
+    _achievementName = "";
+    _achievementDescription = "";
     notifyListeners();
   }
 }

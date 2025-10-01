@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
+import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/detail_spectate_chart.dart';
 import 'package:pocha_points_tracker/widgets/go_back_button.dart';
+import 'package:provider/provider.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class SpectateGameDetailPage extends StatefulWidget {
   final String gameId;
@@ -23,6 +27,33 @@ class _SpectateGameDetailPageState extends State<SpectateGameDetailPage> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) setState(() {});
     });
+    final currentPlayersProvider = context.read<CurrentPlayers>();
+
+    currentPlayersProvider.addListener(() {
+      if (currentPlayersProvider.showAchievement) {
+        final name = currentPlayersProvider.achievementPlayer;
+        final achievementName = currentPlayersProvider.achievementName;
+        final achievementDescription =
+            currentPlayersProvider.achievementDescription;
+
+        Future.microtask(() {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => AchievementOverlay(
+              name: name,
+              achievementName: achievementName,
+              achievementDescription: achievementDescription,
+              onClose: () {
+                currentPlayersProvider.resetAchievementOverlay();
+              },
+            ),
+          );
+          currentPlayersProvider.resetAchievementOverlay();
+        });
+      }
+    });
   }
 
   @override
@@ -33,6 +64,12 @@ class _SpectateGameDetailPageState extends State<SpectateGameDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // avoid blackscreen
+    WakelockPlus.enable();
+
+    // provider
+    final currentPlayersProvider = context.read<CurrentPlayers>();
+
     return StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('games')
@@ -168,238 +205,270 @@ class _SpectateGameDetailPageState extends State<SpectateGameDetailPage> {
             }
           }
           final dealer = gameData['dealer'] ?? '-';
-
-          return SafeArea(
-            child: Scaffold(
-              body: Container(
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      Color.fromARGB(255, 54, 18, 77),
-                      CustomColors.backgroundColor
-                    ],
-                    stops: [0.0, 0.9],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 12.0, top: 24.0, bottom: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Título y fecha
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return Consumer<CurrentPlayers>(builder: (context, value, child) {
+            return SafeArea(
+              child: Stack(
+                children: [
+                  Scaffold(
+                    body: Container(
+                      decoration: const BoxDecoration(
+                        gradient: RadialGradient(
+                          colors: [
+                            Color.fromARGB(255, 54, 18, 77),
+                            CustomColors.backgroundColor
+                          ],
+                          stops: [0.0, 0.9],
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            left: 12.0, top: 24.0, bottom: 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              'Detalle de partida',
-                              style: TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.w500,
+                            // Título y fecha
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 18.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Detalle de partida',
+                                    style: TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            // Tiempo alineado a la izquierda
-                            Row(
-                              children: [
-                                Text(
-                                  elapsed,
-                                  style: const TextStyle(color: Colors.white),
-                                ),
-                                // El Expanded empuja el texto a la izquierda
-                                const Expanded(child: SizedBox()),
-                              ],
-                            ),
-                            const SizedBox(height: 8.0),
-                            // Centrado: Reparte y getCards
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Reparte: $dealer',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 18),
-                                ),
-                                Text(
-                                  getCards(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 22),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-
-                      DataCardUp(
-                          players: players,
-                          votos: votos,
-                          bazas: bazas,
-                          currentVote: currentVote,
-                          currentBaz: currentBaz,
-                          totalScore: totalScore,
-                          ronda: numRondas - 1),
-                      const SizedBox(height: 10.0),
-                      // Gráfica
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Column(
-                              children: [
-                                // Chart
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: SizedBox(
-                                    width: numRondas * 40 >
-                                            MediaQuery.of(context).size.width
-                                        ? numRondas * 40
-                                        : MediaQuery.of(context).size.width,
-                                    child:
-                                        DetailSpectateChart(gameData: gameData),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                // Leyenda
-                                Wrap(
-                                  alignment: WrapAlignment.center,
-                                  spacing: 16,
-                                  runSpacing: 4,
-                                  children: players.map((player) {
-                                    final index = players.indexOf(player);
-                                    return Row(
-                                      spacing: 4,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            color: CustomColors.lineColors[
-                                                index %
-                                                    CustomColors
-                                                        .lineColors.length],
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: const SizedBox(
-                                            width: 12,
-                                            height: 12,
-                                          ),
-                                        ),
-                                        Text(
-                                          player,
-                                          style: const TextStyle(fontSize: 12),
-                                        ),
-                                      ],
-                                    );
-                                  }).toList(),
-                                ),
-                                const SizedBox(height: 16),
-                                // Tabla resumen por jugador
-
-                                SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: DataTable(
-                                    columns: const [
-                                      DataColumn(label: Text('Jugador')),
-                                      DataColumn(label: Text('Puntos')),
-                                      DataColumn(label: Text('% Acierto')),
-                                      DataColumn(label: Text('Racha +')),
-                                      DataColumn(label: Text('Racha -')),
+                            const SizedBox(height: 10.0),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 18.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // Tiempo alineado a la izquierda
+                                  Row(
+                                    children: [
+                                      Text(
+                                        elapsed,
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      // El Expanded empuja el texto a la izquierda
+                                      const Expanded(child: SizedBox()),
                                     ],
-                                    rows: playerStats.map((stats) {
-                                      final playerName = stats['player'];
-                                      final isWinner =
-                                          winners.contains(playerName);
+                                  ),
+                                  const SizedBox(height: 8.0),
+                                  // Centrado: Reparte y getCards
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Reparte: $dealer',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      ),
+                                      Text(
+                                        getCards(),
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 22),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10.0),
 
-                                      int nonWinnerRank = isWinner
-                                          ? 0
-                                          : winners.length +
-                                              nonWinners.indexOf(playerName) +
-                                              1;
-
-                                      return DataRow(cells: [
-                                        DataCell(Row(
-                                          children: [
-                                            isWinner
-                                                ? SvgPicture.asset(
-                                                    'lib/assets/images/mini_cup.svg',
-                                                    height: 18.0,
-                                                    width: 18.0,
-                                                    semanticsLabel: 'mini cup',
-                                                  )
-                                                : Text(
-                                                    '#$nonWinnerRank',
-                                                    style: const TextStyle(
-                                                      color: CustomColors
-                                                          .whiteColor,
-                                                      fontSize: 18.0,
-                                                      fontWeight:
-                                                          FontWeight.w200,
-                                                    ),
-                                                  ),
-                                            const SizedBox(width: 8.0),
-                                            Expanded(
-                                              child: Text(
-                                                playerName,
-                                                style: const TextStyle(
+                            DataCardUp(
+                                players: players,
+                                votos: votos,
+                                bazas: bazas,
+                                currentVote: currentVote,
+                                currentBaz: currentBaz,
+                                totalScore: totalScore,
+                                ronda: numRondas - 1),
+                            const SizedBox(height: 10.0),
+                            // Gráfica
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Column(
+                                    children: [
+                                      // Chart
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: SizedBox(
+                                          width: numRondas * 40 >
+                                                  MediaQuery.of(context)
+                                                      .size
+                                                      .width
+                                              ? numRondas * 40
+                                              : MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                          child: DetailSpectateChart(
+                                              gameData: gameData),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      // Leyenda
+                                      Wrap(
+                                        alignment: WrapAlignment.center,
+                                        spacing: 16,
+                                        runSpacing: 4,
+                                        children: players.map((player) {
+                                          final index = players.indexOf(player);
+                                          return Row(
+                                            spacing: 4,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              DecoratedBox(
+                                                decoration: BoxDecoration(
                                                   color:
-                                                      CustomColors.whiteColor,
+                                                      CustomColors.lineColors[
+                                                          index %
+                                                              CustomColors
+                                                                  .lineColors
+                                                                  .length],
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const SizedBox(
+                                                  width: 12,
+                                                  height: 12,
                                                 ),
                                               ),
-                                            ),
+                                              Text(
+                                                player,
+                                                style: const TextStyle(
+                                                    fontSize: 12),
+                                              ),
+                                            ],
+                                          );
+                                        }).toList(),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      // Tabla resumen por jugador
+
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: DataTable(
+                                          columns: const [
+                                            DataColumn(label: Text('Jugador')),
+                                            DataColumn(label: Text('Puntos')),
+                                            DataColumn(
+                                                label: Text('% Acierto')),
+                                            DataColumn(label: Text('Racha +')),
+                                            DataColumn(label: Text('Racha -')),
                                           ],
-                                        )),
-                                        DataCell(
-                                            Text(stats['puntos'].toString())),
-                                        DataCell(Text(
-                                            '${stats['acierto'].toStringAsFixed(1)}%')),
-                                        DataCell(Text(
-                                            stats['rachaAciertos'].toString())),
-                                        DataCell(Text(
-                                            stats['rachaFallos'].toString())),
-                                      ]);
-                                    }).toList(),
+                                          rows: playerStats.map((stats) {
+                                            final playerName = stats['player'];
+                                            final isWinner =
+                                                winners.contains(playerName);
+
+                                            int nonWinnerRank = isWinner
+                                                ? 0
+                                                : winners.length +
+                                                    nonWinners
+                                                        .indexOf(playerName) +
+                                                    1;
+
+                                            return DataRow(cells: [
+                                              DataCell(Row(
+                                                children: [
+                                                  isWinner
+                                                      ? SvgPicture.asset(
+                                                          'lib/assets/images/mini_cup.svg',
+                                                          height: 18.0,
+                                                          width: 18.0,
+                                                          semanticsLabel:
+                                                              'mini cup',
+                                                        )
+                                                      : Text(
+                                                          '#$nonWinnerRank',
+                                                          style:
+                                                              const TextStyle(
+                                                            color: CustomColors
+                                                                .whiteColor,
+                                                            fontSize: 18.0,
+                                                            fontWeight:
+                                                                FontWeight.w200,
+                                                          ),
+                                                        ),
+                                                  const SizedBox(width: 8.0),
+                                                  Expanded(
+                                                    child: Text(
+                                                      playerName,
+                                                      style: const TextStyle(
+                                                        color: CustomColors
+                                                            .whiteColor,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                              DataCell(Text(
+                                                  stats['puntos'].toString())),
+                                              DataCell(Text(
+                                                  '${stats['acierto'].toStringAsFixed(1)}%')),
+                                              DataCell(Text(
+                                                  stats['rachaAciertos']
+                                                      .toString())),
+                                              DataCell(Text(stats['rachaFallos']
+                                                  .toString())),
+                                            ]);
+                                          }).toList(),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      // Detalle por ronda
+                                      ListView.builder(
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        itemCount: numRondas,
+                                        itemBuilder: (context, ronda) {
+                                          return DataCard(
+                                              players: players,
+                                              votos: votos,
+                                              bazas: bazas,
+                                              totalScore: totalScore,
+                                              ronda: ronda);
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-                                // Detalle por ronda
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: numRondas,
-                                  itemBuilder: (context, ronda) {
-                                    return DataCard(
-                                        players: players,
-                                        votos: votos,
-                                        bazas: bazas,
-                                        totalScore: totalScore,
-                                        ronda: ronda);
-                                  },
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
+                            // Botón atrás
+                            const GoBackButton()
+                          ],
                         ),
                       ),
-                      // Botón atrás
-                      const GoBackButton()
-                    ],
+                    ),
                   ),
-                ),
+                  if (currentPlayersProvider.showAchievement)
+                    AchievementOverlay(
+                        name: currentPlayersProvider.achievementPlayer,
+                        achievementName: currentPlayersProvider.achievementName,
+                        achievementDescription:
+                            currentPlayersProvider.achievementDescription,
+                        onClose: () {
+                          currentPlayersProvider.resetAchievementOverlay();
+                        })
+                ],
               ),
-            ),
-          );
+            );
+          });
         });
   }
 }

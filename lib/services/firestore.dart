@@ -308,4 +308,51 @@ class FirestoreService {
   Future<void> deletePlayer(String docID) {
     return players.doc(docID).delete();
   }
+
+  Future<bool> achievement({
+    required String achievementId,
+    required String playerName,
+  }) async {
+    final achievementRef = FirebaseFirestore.instance
+        .collection('achievements')
+        .doc(achievementId);
+
+    final snapshot = await achievementRef.get();
+
+    if (!snapshot.exists) return false;
+
+    final achievementData = snapshot.data()!;
+    List<Map<String, dynamic>> playersList =
+        List<Map<String, dynamic>>.from(achievementData['players'] ?? []);
+
+    final playerIndex = playersList.indexWhere((p) => p['name'] == playerName);
+
+    bool nuevo = false;
+
+    if (playerIndex != -1) {
+      // Solo actualizamos si no estaba completado ya
+      if (playersList[playerIndex]['completado'] != true) {
+        playersList[playerIndex] = {
+          ...playersList[playerIndex],
+          'completado': true,
+          'fecha': DateTime.now().toIso8601String(),
+        };
+        nuevo = true;
+      }
+    } else {
+      // Si el jugador aún no está en la lista
+      playersList.add({
+        'name': playerName,
+        'completado': true,
+        'fecha': DateTime.now().toIso8601String(),
+      });
+      nuevo = true;
+    }
+
+    if (nuevo) {
+      await achievementRef.update({'players': playersList});
+    }
+
+    return nuevo;
+  }
 }

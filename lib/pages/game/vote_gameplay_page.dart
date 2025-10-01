@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
@@ -32,148 +33,162 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
 
   @override
   Widget build(BuildContext context) {
+    // avoid blackscreen
+    WakelockPlus.enable();
     // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
-    // avoid blackscreen
-    WakelockPlus.enable();
+    return Consumer<CurrentPlayers>(builder: (context, value, child) {
+      return SafeArea(
+        child: Stack(
+          children: [
+            Scaffold(
+              body: Container(
+                decoration: const BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Color.fromARGB(255, 54, 18, 77),
+                      CustomColors.backgroundColor
+                    ],
+                    stops: [
+                      0.0,
+                      0.9,
+                    ],
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
+                              style: const TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.more_vert,
+                                size: 32.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
+                              style: const TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Text(
+                              ' | ',
+                              style: TextStyle(
+                                color: CustomColors.primaryColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Text(
+                              'Reparte: ',
+                              style: TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              currentPlayersProvider
+                                  .currentPlayers.last.playerName,
+                              style: const TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 12.0),
+                      const Divider(
+                        thickness: 1.5,
+                        color: CustomColors.primaryColor,
+                      ),
+                      const SizedBox(height: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Apuestas',
+                              style: TextStyle(
+                                color: CustomColors.whiteColor,
+                                fontSize: 24.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
 
-    return Consumer<CurrentPlayers>(
-      builder: (context, value, child) => SafeArea(
-        child: Scaffold(
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  Color.fromARGB(255, 54, 18, 77),
-                  CustomColors.backgroundColor
-                ],
-                stops: [
-                  0.0,
-                  0.9,
-                ],
+                      // Containers of each player
+                      Expanded(
+                        child: ListView.builder(
+                            itemCount:
+                                currentPlayersProvider.currentPlayers.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return PlayerVoteContainer(playerIndex: index);
+                            }),
+                      ),
+                      const SizedBox(height: 16.0),
+                      // next button
+                      CustomButton(
+                        text: 'Bazas',
+                        width: 340.0,
+                        isDisabled: !currentPlayersProvider.didAllPlayersVote,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const BazGameplayPage()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
-                          style: const TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.more_vert,
-                            size: 32.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
-                          style: const TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Text(
-                          ' | ',
-                          style: TextStyle(
-                            color: CustomColors.primaryColor,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const Text(
-                          'Reparte: ',
-                          style: TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          currentPlayersProvider.currentPlayers.last.playerName,
-                          style: const TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12.0),
-                  const Divider(
-                    thickness: 1.5,
-                    color: CustomColors.primaryColor,
-                  ),
-                  const SizedBox(height: 16.0),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Apuestas',
-                          style: TextStyle(
-                            color: CustomColors.whiteColor,
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16.0),
-
-                  // Containers of each player
-                  Expanded(
-                    child: ListView.builder(
-                        itemCount: currentPlayersProvider.currentPlayers.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return PlayerVoteContainer(playerIndex: index);
-                        }),
-                  ),
-                  const SizedBox(height: 16.0),
-                  // next button
-                  CustomButton(
-                    text: 'Bazas',
-                    width: 340.0,
-                    isDisabled: !currentPlayersProvider.didAllPlayersVote,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const BazGameplayPage()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
+            if (currentPlayersProvider.showAchievement)
+              AchievementOverlay(
+                  name: currentPlayersProvider.achievementPlayer,
+                  achievementName: currentPlayersProvider.achievementName,
+                  achievementDescription:
+                      currentPlayersProvider.achievementDescription,
+                  onClose: () {
+                    currentPlayersProvider.resetAchievementOverlay();
+                  })
+          ],
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

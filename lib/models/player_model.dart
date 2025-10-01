@@ -10,6 +10,7 @@ class PlayerInGame {
   bool winner;
   List<String> bazList;
   List<String> voteList;
+  int streak;
 
   PlayerInGame({
     required this.playerName,
@@ -21,6 +22,7 @@ class PlayerInGame {
     this.vote = '-',
     this.baz = '-',
     this.winner = false,
+    this.streak = 0,
     List<String>? bazList,
     List<String>? voteList,
   })  : totalScore = totalScore ?? [],

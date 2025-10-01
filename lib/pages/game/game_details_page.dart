@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
@@ -59,10 +60,15 @@ class GameDetailsPage extends StatelessWidget {
                                 fontWeight: FontWeight.w200,
                               ),
                             )
-                          : SvgPicture.asset('lib/assets/images/mini_cup.svg',
-                              height: 18.0,
-                              width: 18.0,
-                              semanticsLabel: 'mini cup'),
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 4.0, right: 4.0),
+                              child: SvgPicture.asset(
+                                  'lib/assets/images/mini_cup.svg',
+                                  height: 18.0,
+                                  width: 18.0,
+                                  semanticsLabel: 'mini cup'),
+                            ),
                       const SizedBox(width: 8.0),
                       Text(
                         player.playerName,
@@ -90,88 +96,101 @@ class GameDetailsPage extends StatelessWidget {
 
     return Consumer<CurrentPlayers>(
       builder: (context, value, child) => SafeArea(
-        child: Scaffold(
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: RadialGradient(
-                colors: [
-                  Color.fromARGB(255, 54, 18, 77),
-                  CustomColors.backgroundColor
-                ],
-                stops: [
-                  0.0,
-                  0.9,
-                ],
-              ),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 24.0, horizontal: 18.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Text(
-                      'Clasificación de la partida',
-                      style: TextStyle(
-                        color: CustomColors.whiteColor,
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+        child: Stack(
+          children: [
+            Scaffold(
+              body: Container(
+                decoration: const BoxDecoration(
+                  gradient: RadialGradient(
+                    colors: [
+                      Color.fromARGB(255, 54, 18, 77),
+                      CustomColors.backgroundColor
+                    ],
+                    stops: [
+                      0.0,
+                      0.9,
+                    ],
                   ),
-                  const SizedBox(height: 56.0),
-                  // show winner
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(children: buildStatsWidget()),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 24.0, horizontal: 18.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          'Clasificación de la partida',
+                          style: TextStyle(
+                            color: CustomColors.whiteColor,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                      const SizedBox(height: 56.0),
+                      // show winner
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(children: buildStatsWidget()),
+                            ),
+                          ],
+                        ),
+                      ),
 
-                  // restart and menu buttons
-                  TextButton(
-                    onPressed: () {
-                      currentPlayersProvider.restartGame();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
+                      // restart and menu buttons
+                      TextButton(
+                        onPressed: () {
+                          currentPlayersProvider.restartGame();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomePage(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Volver al menú',
+                          style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            decorationColor: CustomColors.whiteColor,
+                            color: CustomColors.whiteColor,
+                            fontSize: 20.0,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      'Volver al menú',
-                      style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        decorationColor: CustomColors.whiteColor,
-                        color: CustomColors.whiteColor,
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w500,
                       ),
-                    ),
+                      CustomButton(
+                        text: 'Nueva partida',
+                        width: 340.0,
+                        onPressed: () {
+                          currentPlayersProvider.restartGame();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SelectPlayersPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                  CustomButton(
-                    text: 'Nueva partida',
-                    width: 340.0,
-                    onPressed: () {
-                      currentPlayersProvider.restartGame();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SelectPlayersPage(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+            if (currentPlayersProvider.showAchievement)
+              AchievementOverlay(
+                  name: currentPlayersProvider.achievementPlayer,
+                  achievementName: currentPlayersProvider.achievementName,
+                  achievementDescription:
+                      currentPlayersProvider.achievementDescription,
+                  onClose: () {
+                    currentPlayersProvider.resetAchievementOverlay();
+                  })
+          ],
         ),
       ),
     );
