@@ -6,14 +6,41 @@ import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:pocha_points_tracker/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _loadingAchievements = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAchievements();
+  }
+
+  Future<void> _loadAchievements() async {
+    await Provider.of<CurrentPlayers>(context, listen: false)
+        .loadCompletedAchievements();
+    setState(() {
+      _loadingAchievements = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
-
+    if (_loadingAchievements) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return SafeArea(
       child: Scaffold(
         body: Container(

@@ -9,6 +9,19 @@ final FirestoreService firestoreService = FirestoreService();
 final CollectionReference playersCollection =
     FirebaseFirestore.instance.collection('players');
 
+class AchievementData {
+  final String docId;
+  final String playerName;
+  final String achievementName;
+  final String achievementDescription;
+  AchievementData({
+    required this.docId,
+    required this.playerName,
+    required this.achievementName,
+    required this.achievementDescription,
+  });
+}
+
 // currentplayers provider
 class CurrentPlayers extends ChangeNotifier {
   List<PlayerInGame> _currentPlayers = [];
@@ -73,17 +86,22 @@ class CurrentPlayers extends ChangeNotifier {
   bool _openRankDropdown = false;
   bool get openRankDropdown => _openRankDropdown;
 
-  bool _showAchievement = false;
-  bool get showAchievement => _showAchievement;
+  final List<AchievementData> _pendingAchievements = [];
 
-  String _achievementPlayer = "";
-  String get achievementPlayer => _achievementPlayer;
+  AchievementData? get currentAchievement =>
+      _pendingAchievements.isNotEmpty ? _pendingAchievements.first : null;
 
-  String _achievementName = "";
-  String get achievementName => _achievementName;
+  bool get showAchievement => _pendingAchievements.isNotEmpty;
 
-  String _achievementDescription = "";
-  String get achievementDescription => _achievementDescription;
+  final String _achievementPlayer = "";
+  String get achievementPlayer => currentAchievement?.playerName ?? '';
+
+  final String _achievementName = "";
+  String get achievementName => currentAchievement?.achievementName ?? '';
+
+  final String _achievementDescription = "";
+  String get achievementDescription =>
+      currentAchievement?.achievementDescription ?? '';
 
   List<SortLabelDropdown> _dropdownValues = [
     SortLabelDropdown(
@@ -108,6 +126,9 @@ class CurrentPlayers extends ChangeNotifier {
     ),
   ];
   List<SortLabelDropdown> get dropdownValues => _dropdownValues;
+
+  Set<String> _completedAchievements = {};
+  Set<String> get completedAchievements => _completedAchievements;
 
   // add a player to the new game
   Future<void> addPlayers() async {
@@ -589,7 +610,10 @@ class CurrentPlayers extends ChangeNotifier {
     );
 
     // check achievements
-    if (_currentPlayers.length >= 3) checkAchievementsPoints();
+    if (_currentPlayers.length >= 3) {
+      checkAchievementsPoints();
+      checkAchievements();
+    }
 
     // we have to update the score of the players
     // we have to clean the players localpoints, vote and baz to 0
@@ -642,6 +666,23 @@ class CurrentPlayers extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadCompletedAchievements() async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection('achievements').get();
+    final Set<String> completed = {};
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final players = List<Map<String, dynamic>>.from(data['players'] ?? []);
+      for (final p in players) {
+        if (p['completado'] == true) {
+          completed.add('${doc.id}_${p['name']}');
+        }
+      }
+    }
+    _completedAchievements = completed;
+    notifyListeners();
+  }
+
   void checkAchievementsRounds() async {
     for (int i = 0; i < _currentPlayers.length; i++) {
       if (_currentPlayers[i].streak == 10) {
@@ -649,10 +690,12 @@ class CurrentPlayers extends ChangeNotifier {
             achievementId: 'racha_10',
             playerName: _currentPlayers[i].playerName);
         if (nuevo) {
-          _showAchievement = true;
-          _achievementPlayer = _currentPlayers[i].playerName;
-          _achievementName = "Richi 10 rachas";
-          _achievementDescription = "Racha de 10 bazas";
+          AchievementData(
+            docId: 'racha_10',
+            playerName: _currentPlayers[i].playerName,
+            achievementName: "Richi 10 rachas",
+            achievementDescription: "Racha de diez aciertos",
+          );
         }
         notifyListeners();
       }
@@ -661,20 +704,22 @@ class CurrentPlayers extends ChangeNotifier {
 
   void checkAchievementsSevenBaz() async {
     for (int i = 0; i < _currentPlayers.length; i++) {
-      if (_currentPlayers[i].bazList.last == '1' &&
-          _currentPlayers[i].voteList.last == '1') {
+      if (_currentPlayers[i].bazList.last == '7' &&
+          _currentPlayers[i].voteList.last == '7') {
         final nuevo = await firestoreService.achievement(
             achievementId: 'bazas_7',
             playerName: _currentPlayers[i].playerName);
         if (nuevo) {
-          _achievementPlayer = _currentPlayers[i].playerName;
-          _achievementName = "All-in al 7";
-          _achievementDescription = "45 puntos en una ronda";
-          _showAchievement = true;
+          AchievementData(
+            docId: 'bazas_7',
+            playerName: _currentPlayers[i].playerName,
+            achievementName: "All-in al 7",
+            achievementDescription: "45 puntos en una ronda",
+          );
         }
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   void checkAchievementsPoints() async {
@@ -684,21 +729,57 @@ class CurrentPlayers extends ChangeNotifier {
             achievementId: 'score_200',
             playerName: _currentPlayers[i].playerName);
         if (nuevo) {
-          _achievementPlayer = _currentPlayers[i].playerName;
-          _achievementName = "Mister 200%";
-          _achievementDescription = "200 puntos en una partida";
-          _showAchievement = true;
+          queueAchievement(AchievementData(
+            docId: 'score_200',
+            playerName: _currentPlayers[i].playerName,
+            achievementName: "Mister 200%",
+            achievementDescription: "200 puntos en una partida",
+          ));
         }
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
-  void resetAchievementOverlay() {
-    _showAchievement = false;
-    _achievementPlayer = "";
-    _achievementName = "";
-    _achievementDescription = "";
+  void showExternalAchievement({
+    required String docId,
+    required String playerName,
+    required String achievementName,
+    required String achievementDescription,
+  }) {
+    queueAchievement(
+      AchievementData(
+        docId: docId,
+        playerName: playerName,
+        achievementName: achievementName,
+        achievementDescription: achievementDescription,
+      ),
+    );
     notifyListeners();
+  }
+
+  void queueAchievement(AchievementData achievement) {
+    // Evita duplicados
+    if (_pendingAchievements.any((a) =>
+        a.docId == achievement.docId &&
+        a.playerName == achievement.playerName)) {
+      return;
+    }
+    _pendingAchievements.add(achievement);
+    notifyListeners();
+  }
+
+  VoidCallback? onLastAchievementClosed;
+
+  void resetAchievementOverlay() {
+    if (_pendingAchievements.isNotEmpty) {
+      _pendingAchievements.removeAt(0);
+      notifyListeners();
+    }
+    if (_pendingAchievements.isEmpty && onLastAchievementClosed != null) {
+      onLastAchievementClosed!();
+      onLastAchievementClosed = null;
+      notifyListeners();
+    }
   }
 }

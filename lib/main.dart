@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:pocha_points_tracker/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:pocha_points_tracker/pages/create_achievements/create_achievements_page.dart';
-import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
+import 'package:pocha_points_tracker/pages/achievement/achievement_overlay.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:provider/provider.dart';
 

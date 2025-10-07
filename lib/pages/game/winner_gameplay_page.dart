@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/provider/provider.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
@@ -64,6 +63,18 @@ class _WinnerGameplayPageState extends State<WinnerGameplayPage> {
                 MaterialPageRoute(
                     builder: (context) => const GameDetailsPage()),
               );
+              Future.delayed(const Duration(milliseconds: 300), () {
+                final provider =
+                    Provider.of<CurrentPlayers>(context, listen: false);
+                if (provider.currentPlayers.first.score >= 200) {
+                  provider.showExternalAchievement(
+                    docId: 'score_200',
+                    playerName: provider.currentPlayers.first.playerName,
+                    achievementName: "Mister 200%",
+                    achievementDescription: "200 puntos en una partida",
+                  );
+                }
+              });
             },
             child: Container(
               decoration: const BoxDecoration(

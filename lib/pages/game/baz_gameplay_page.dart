@@ -112,7 +112,10 @@ class _BazGameplayPageState extends State<BazGameplayPage> {
                           ),
                         ),
                         Text(
-                          currentPlayersProvider.currentPlayers.last.playerName,
+                          currentPlayersProvider.currentPlayers.isNotEmpty
+                              ? currentPlayersProvider
+                                  .currentPlayers.last.playerName
+                              : '',
                           style: const TextStyle(
                             color: CustomColors.whiteColor,
                             fontSize: 20.0,

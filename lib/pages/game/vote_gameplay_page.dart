@@ -1,5 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
+import 'package:pocha_points_tracker/pages/achievement/achievement_overlay.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_snap_list/scroll_snap_list.dart';
@@ -20,6 +21,8 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
   // firestore service
   final FirestoreService firestoreService = FirestoreService();
 
+  final Set<String> _shownAchievements = {};
+
   // sort by name / points
   late bool sortByName = true;
 
@@ -38,157 +41,212 @@ class _VoteGameplayPageState extends State<VoteGameplayPage> {
     // provider
     final currentPlayersProvider = context.read<CurrentPlayers>();
 
-    return Consumer<CurrentPlayers>(builder: (context, value, child) {
-      return SafeArea(
-        child: Stack(
-          children: [
-            Scaffold(
-              body: Container(
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    colors: [
-                      Color.fromARGB(255, 54, 18, 77),
-                      CustomColors.backgroundColor
-                    ],
-                    stops: [
-                      0.0,
-                      0.9,
-                    ],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
-                              style: const TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {},
-                              icon: const Icon(
-                                Icons.more_vert,
-                                size: 32.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
-                              style: const TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Text(
-                              ' | ',
-                              style: TextStyle(
-                                color: CustomColors.primaryColor,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Text(
-                              'Reparte: ',
-                              style: TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              currentPlayersProvider
-                                  .currentPlayers.last.playerName,
-                              style: const TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12.0),
-                      const Divider(
-                        thickness: 1.5,
-                        color: CustomColors.primaryColor,
-                      ),
-                      const SizedBox(height: 16.0),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Apuestas',
-                              style: TextStyle(
-                                color: CustomColors.whiteColor,
-                                fontSize: 24.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
+    return StreamBuilder<QuerySnapshot>(
+        stream:
+            FirebaseFirestore.instance.collection('achievements').snapshots(),
+        builder: (context, snapshotAchievements) {
+          if (snapshotAchievements.hasData) {
+            final completedAchievements =
+                context.read<CurrentPlayers>().completedAchievements;
+            final shownAchievements = _shownAchievements;
 
-                      // Containers of each player
-                      Expanded(
-                        child: ListView.builder(
-                            itemCount:
-                                currentPlayersProvider.currentPlayers.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return PlayerVoteContainer(playerIndex: index);
-                            }),
+            for (final doc in snapshotAchievements.data!.docs) {
+              final data = doc.data() as Map<String, dynamic>;
+              final players =
+                  List<Map<String, dynamic>>.from(data['players'] ?? []);
+              final completed =
+                  players.where((p) => p['completado'] == true).toList();
+
+              for (final p in completed) {
+                final achievementKey = '${doc.id}_${p['name']}';
+
+                // Solo muestra si no está en achievements completados ni en los ya mostrados en esta sesión
+                if (!completedAchievements.contains(achievementKey) &&
+                    !shownAchievements.contains(achievementKey)) {
+                  shownAchievements.add(achievementKey);
+                  // Marca como completado en el provider para esta sesión
+                  context
+                      .read<CurrentPlayers>()
+                      .completedAchievements
+                      .add(achievementKey);
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    context.read<CurrentPlayers>().showExternalAchievement(
+                          docId: doc.id,
+                          playerName: p['name'],
+                          achievementName: data['name'],
+                          achievementDescription: data['description'],
+                        );
+                  });
+                }
+              }
+            }
+          }
+          return Consumer<CurrentPlayers>(builder: (context, value, child) {
+            return SafeArea(
+              child: Stack(
+                children: [
+                  Scaffold(
+                    body: Container(
+                      decoration: const BoxDecoration(
+                        gradient: RadialGradient(
+                          colors: [
+                            Color.fromARGB(255, 54, 18, 77),
+                            CustomColors.backgroundColor
+                          ],
+                          stops: [
+                            0.0,
+                            0.9,
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 16.0),
-                      // next button
-                      CustomButton(
-                        text: 'Bazas',
-                        width: 340.0,
-                        isDisabled: !currentPlayersProvider.didAllPlayersVote,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const BazGameplayPage()),
-                          );
-                        },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Ronda ${currentPlayersProvider.round}${currentPlayersProvider.lastRound && currentPlayersProvider.wePlayIndia ? ' (Ciega)' : ''}',
+                                    style: const TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 18.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.more_vert,
+                                      size: 32.0,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    '${currentPlayersProvider.numberOfCards} carta${currentPlayersProvider.numberOfCards == 1 ? '' : 's'}',
+                                    style: const TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Text(
+                                    ' | ',
+                                    style: TextStyle(
+                                      color: CustomColors.primaryColor,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Text(
+                                    'Reparte: ',
+                                    style: TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    currentPlayersProvider
+                                            .currentPlayers.isNotEmpty
+                                        ? currentPlayersProvider
+                                            .currentPlayers.last.playerName
+                                        : '',
+                                    style: const TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 12.0),
+                            const Divider(
+                              thickness: 1.5,
+                              color: CustomColors.primaryColor,
+                            ),
+                            const SizedBox(height: 16.0),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Apuestas',
+                                    style: TextStyle(
+                                      color: CustomColors.whiteColor,
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 16.0),
+
+                            // Containers of each player
+                            Expanded(
+                              child: ListView.builder(
+                                  itemCount: currentPlayersProvider
+                                      .currentPlayers.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return PlayerVoteContainer(
+                                        playerIndex: index);
+                                  }),
+                            ),
+                            const SizedBox(height: 16.0),
+                            // next button
+                            CustomButton(
+                              text: 'Bazas',
+                              width: 340.0,
+                              isDisabled:
+                                  !currentPlayersProvider.didAllPlayersVote,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const BazGameplayPage()),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  if (value.showAchievement && value.currentAchievement != null)
+                    AchievementOverlay(
+                      key: ValueKey(
+                          '${value.currentAchievement!.docId}_${value.currentAchievement!.playerName}'),
+                      name: value.currentAchievement!.playerName,
+                      achievementName:
+                          value.currentAchievement!.achievementName,
+                      achievementDescription:
+                          value.currentAchievement!.achievementDescription,
+                      onClose: () {
+                        value.resetAchievementOverlay();
+                      },
+                    )
+                ],
               ),
-            ),
-            if (currentPlayersProvider.showAchievement)
-              AchievementOverlay(
-                  name: currentPlayersProvider.achievementPlayer,
-                  achievementName: currentPlayersProvider.achievementName,
-                  achievementDescription:
-                      currentPlayersProvider.achievementDescription,
-                  onClose: () {
-                    currentPlayersProvider.resetAchievementOverlay();
-                  })
-          ],
-        ),
-      );
-    });
+            );
+          });
+        });
   }
 }
 

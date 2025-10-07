@@ -338,7 +338,27 @@ class _GameRegisterPageState extends State<GameRegisterPage> {
                   ),
 
                   // back and next buttons
-                  const GoBackButton(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: TextButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomePage(),
+                        ),
+                      ),
+                      child: const Text(
+                        "Atrás",
+                        style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          decorationColor: CustomColors.whiteColor,
+                          color: CustomColors.whiteColor,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
                   CustomButton(
                     text: 'Nueva partida',
                     width: 340.0,

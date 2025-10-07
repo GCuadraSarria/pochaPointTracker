@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pocha_points_tracker/pages/create_achievements/achievement_overlay.dart';
+import 'package:pocha_points_tracker/pages/achievement/achievement_overlay.dart';
 import 'package:pocha_points_tracker/pages/pages.dart';
 import 'package:pocha_points_tracker/theme/theme.dart';
 import 'package:provider/provider.dart';
@@ -163,33 +163,23 @@ class GameDetailsPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      CustomButton(
-                        text: 'Nueva partida',
-                        width: 340.0,
-                        onPressed: () {
-                          currentPlayersProvider.restartGame();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SelectPlayersPage(),
-                            ),
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            if (currentPlayersProvider.showAchievement)
+            if (value.showAchievement && value.currentAchievement != null)
               AchievementOverlay(
-                  name: currentPlayersProvider.achievementPlayer,
-                  achievementName: currentPlayersProvider.achievementName,
-                  achievementDescription:
-                      currentPlayersProvider.achievementDescription,
-                  onClose: () {
-                    currentPlayersProvider.resetAchievementOverlay();
-                  })
+                key: ValueKey(
+                    '${value.currentAchievement!.docId}_${value.currentAchievement!.playerName}'),
+                name: value.currentAchievement!.playerName,
+                achievementName: value.currentAchievement!.achievementName,
+                achievementDescription:
+                    value.currentAchievement!.achievementDescription,
+                onClose: () {
+                  value.resetAchievementOverlay();
+                },
+              )
           ],
         ),
       ),
