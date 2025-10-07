@@ -1,0 +1,2 @@
+/Users/guillermo.cuadra/pochaPointTracker/android/app/.cxx/RelWithDebInfo/4j1h1646/x86/CMakeFiles/edit_cache.dir
+/Users/guillermo.cuadra/pochaPointTracker/android/app/.cxx/RelWithDebInfo/4j1h1646/x86/CMakeFiles/rebuild_cache.dir
